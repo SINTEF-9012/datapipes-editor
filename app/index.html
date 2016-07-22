@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" ng-app="bigmlEditor">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>BigML Editor</title>
+    
+    <!--
+    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
+    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jointjs/0.9.7/joint.core.min.css" >
+    -->
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="_remote/bootstrap.min.css" >
+    <link rel="stylesheet" type="text/css" href="_remote/joint.core.min.css" >
+    <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css" >
+
+    <!--
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.1/backbone-min.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jointjs/0.9.6/joint.min.js"></script>
+    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0/angular.min.js"></script>
+    -->
+    <script type="application/javascript" src="_remote/jquery.min.js"></script>
+    <script type="application/javascript" src="_remote/lodash.min.js"></script>
+    <script type="application/javascript" src="_remote/backbone-min.js"></script>
+    <script type="application/javascript" src="_remote/joint.min.js"></script>
+    <script type="application/javascript" src="_remote/angular.min.js"></script>
+    
+    <script type="application/javascript" src="index.js"></script>
+    <script type="application/javascript" src="jointjs.js"></script>
+    <script type="application/javascript" src="components/data_components/basic.js"></script>
+    <script type="application/javascript" src="components/data_components/databases.js"></script>
+    <script type="application/javascript" src="components/data_components/queues.js"></script>
+    <script type="application/javascript" src="components/toolbox_left/toolbox-element.directive.js"></script>
+    <script type="application/javascript" src="components/toolbox_left/toolbox.directive.js"></script>
+    <script type="application/javascript" src="components/properties_editor/properties-editor.directive.js"></script>
+  </head>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">BigML - Editor</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href=""><i class="fa fa-cloud-download"></i> Import</a></li>
+          <li><a href=""><i class="fa fa-cloud-upload"></i> Export</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#"><i class="fa fa-question-circle"></i> Help</a></li>
+          <li class="dropdown">
+            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Settings</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="#">Log Out</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+  <body ng-controller="editor">
+    <!-- Left side menu -->
+    <toolbox-left></toolbox-left>
+
+    <!--  Middle editor area -->
+    <div jointjs-editor id="workflow" class="col-xs-10">
+    </div>
+    
+    <!-- Right side properties --->
+    <div component-properties-editor id="properties" class="col-xs-2 gradientborder stowed">
+      <!--<h2>Properties</h2>-->
+      <!--<div ng-repeat="property in propertyEditorElement.properties">-->
+        <!--<p>{{ property.name }}</p>-->
+      <!--</div>-->
+    </div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+<h2>Properties</h2>
+<div ng-repeat="property in propertyEditorElement.properties">
+
+    <form name="myForm">
+        <label>
+            {{ property.name }}:
+            <input type="text" name="propertyValue" ng-model="property.value" required>
+        </label>
+</div>

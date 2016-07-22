@@ -1,0 +1,11 @@
+.idea
+./node_modules
+./node_modules
+./app/bower_modules
+test
+test/*
+**/*~
+*~
+
+**/node_modules
+
