@@ -4,7 +4,7 @@ angular
 
 function toolboxElement (dragdrop) {
     return {
-        template: '<img ng-if="component.icon" ng-src="{{ component.icon }}" alt="{{ component.text }}"> {{ component.text }}',
+        template: '<img ng-if="component.icon" ng-src="{{ component.icon }}" alt="{{ component.text }}">{{ component.text }}',
         link: function(scope, elem) {
             elem.attr('draggable','true');
 

@@ -5,29 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <title>BigML Editor</title>
-    
-    <!--
-    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" >
-    <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/jointjs/0.9.7/joint.core.min.css" >
-    -->
+
     <link rel="stylesheet" type="text/css" href="index.css">
     <link rel="stylesheet" type="text/css" href="_remote/bootstrap.min.css" >
     <link rel="stylesheet" type="text/css" href="_remote/joint.core.min.css" >
     <link rel="stylesheet" type="text/css" href="assets/css/font-awesome.min.css" >
 
-    <!--
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.1/backbone-min.js"></script>
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jointjs/0.9.6/joint.min.js"></script>
-    <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0/angular.min.js"></script>
-    -->
+
     <script type="application/javascript" src="_remote/jquery.min.js"></script>
     <script type="application/javascript" src="_remote/lodash.min.js"></script>
     <script type="application/javascript" src="_remote/backbone-min.js"></script>
     <script type="application/javascript" src="_remote/joint.min.js"></script>
     <script type="application/javascript" src="_remote/angular.min.js"></script>
-    
+
+
+    <script type="application/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.min.js"></script>
     <script type="application/javascript" src="index.js"></script>
     <script type="application/javascript" src="jointjs.js"></script>
     <script type="application/javascript" src="components/data_components/basic.js"></script>
@@ -54,7 +47,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
           <li><a href=""><i class="fa fa-cloud-download"></i> Import</a></li>
-          <li><a href=""><i class="fa fa-cloud-upload"></i> Export</a></li>
+          <li ng-click='exportDiagram()' download="graph.json" ng-href="{{ url }}"><a href=""><i class="fa fa-cloud-upload"></i> Export</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#"><i class="fa fa-question-circle"></i> Help</a></li>

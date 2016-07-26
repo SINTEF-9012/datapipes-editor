@@ -23,7 +23,16 @@
       'subgroups': []
     };
   });
-  
+
+  /*joint.shapes.bigml.toolElement = joint.shapes.basic.Generic.extend({
+    toolMarkup: ['<button class="trigger"><i class="fa fa-expand"></i><i class="fa fa-compress"></i></button>'].join(''),
+    defaults: joint.util.deepSupplement({
+      attrs: {
+        text: { 'font-weight': 400, 'font-size': 'small', fill: 'black', 'text-anchor': 'middle', 'ref-x': .5, 'ref-y': .5, 'y-alignment': 'middle' },
+      },
+    }, joint.shapes.basic.Generic.prototype.defaults)
+  });*/
+
   /* Component element */
   bigml.Component = joint.shapes.basic.Rect.extend({
     defaults: joint.util.deepSupplement({
@@ -53,17 +62,31 @@
   bigml.Composite = bigml.Component.extend({
     defaults: joint.util.deepSupplement({
       type: 'bigml.Composite',
-      size: { width: 400, height: 300 },
+      size: { width: 250, height: 250 },
+      originalSize: {width: 200, height:200},
       attrs: {
         'rect': {
           rx: 10,
           ry: 10,
           'stroke-dasharray': '5,5'
         }
+      },
+      // constructor to have an individual properties array (else it's shared)
+      constructor : function() {
+        bigml.Composite.__super__.constructor.apply(this);
+        this.properties = [
+          {
+            name: 'is Composite',
+            description: 'Should the element contains elements',
+            type: 'boolean',
+            value: true
+          }
+        ];
       }
     }, joint.shapes.basic.Rect.prototype.defaults)
   });
-  
+
+
   /* Add to components list for GUI */
   mod.decorator('bigmlComponents', ['$delegate', function(components) {
     components.subgroups.push({

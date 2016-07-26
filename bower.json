@@ -10,6 +10,7 @@
     "angular-mocks": "~1.5.0",
     "html5-boilerplate": "^5.3.0",
     "angular-messages": "^1.5.6",
-    "jointjs": "joint#^0.9.10"
+    "jointjs": "joint#^0.9.10",
+    "angular-file-saver": "^1.1.2"
   }
 }

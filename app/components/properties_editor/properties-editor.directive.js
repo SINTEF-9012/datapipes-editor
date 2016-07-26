@@ -11,7 +11,7 @@ function componentPropertiesEditor() {
             scope.showProperties = function(jointEl) {
                 scope.$apply(function() {
                     scope.propertyEditorElement = jointEl;
-                    console.log(scope.propertyEditorElement.properties[0]);
+                    console.log(jointEl);
                 });
                 elem.removeClass('stowed');
             };
@@ -19,6 +19,10 @@ function componentPropertiesEditor() {
             scope.hideProperties = function() {
                 elem.addClass('stowed');
             };
+
+            scope.removeElement = function () {
+                scope.propertyEditorElement.remove();
+            }
         }
     };
 }

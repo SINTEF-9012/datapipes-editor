@@ -70,3 +70,7 @@ html, body, body > div {
 #workflow svg#v-2 {
   background-color: rgba(254, 255, 247, 0.02);
 }
+
+.buttonControl {
+  text-align: center;
+}
