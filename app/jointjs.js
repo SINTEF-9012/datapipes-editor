@@ -65,20 +65,23 @@
           width: '100%',
           height: '100%',
           snapLinks: true,
-          validateConnection: function(cellS, magnetS, cellT, magnetT) {
-            // Needs to connect magnets together, and not with itself
-            if (!magnetS || !magnetT || magnetS === magnetT) return false;
-
-            // Don't allow connections to same element
-            if (cellS === cellT) return false;
-
-            // Only allow output->input ports
-            if (magnetS.getAttribute('port') != 'out' || magnetT.getAttribute('port') != 'in') return false;
-
-            // This should be OK
-            return true;
+          validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+            // Prevent loop linking
+            if (magnetS && magnetS.getAttribute('type') === 'input') return false;
+            // Prevent linking from output ports to input ports within one element.
+            if (cellViewS === cellViewT) return false;
+            // Prevent linking to input ports.
+            return magnetT && magnetT.getAttribute('type') === 'input';
           },
-          defaultLink: new joint.shapes.bigml.Dataflow
+          validateMagnet: function(cellView, magnet) {
+            // Note that this is the default behaviour. Just showing it here for reference.
+            // Disable linking interaction for magnets marked as passive (see below `.inPorts circle`).
+            return magnet.getAttribute('magnet') !== 'passive';
+          },
+          // Enable link snapping within 75px lookup radius
+          snapLinks: { radius: 75 },
+          defaultLink: new joint.shapes.bigml.Dataflow,
+          async: true
         });
         $(scope.jointPaper.svg).css('background-color','white');
 

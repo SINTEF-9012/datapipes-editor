@@ -74,3 +74,8 @@ html, body, body > div {
 .buttonControl {
   text-align: center;
 }
+
+.center-th {
+  text-align: center;
+  vertical-align: middle;
+}

@@ -16,9 +16,8 @@
     <script type="application/javascript" src="_remote/lodash.min.js"></script>
     <script type="application/javascript" src="_remote/backbone-min.js"></script>
     <script type="application/javascript" src="_remote/joint.min.js"></script>
-    <script type="application/javascript" src="_remote/angular.min.js"></script>
     <script type="application/javascript" src="assets/js/joint.shapes.devs.min.js"></script>
-
+    <script type="application/javascript" src="_remote/angular.min.js"></script>
 
     <script type="application/javascript" src="assets/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.min.js"></script>
@@ -27,9 +26,19 @@
     <script type="application/javascript" src="components/data_components/basic.js"></script>
     <script type="application/javascript" src="components/data_components/databases.js"></script>
     <script type="application/javascript" src="components/data_components/queues.js"></script>
+    <script type="application/javascript" src="components/data_components/dataSource.js"></script>
     <script type="application/javascript" src="components/toolbox_left/toolbox-element.directive.js"></script>
     <script type="application/javascript" src="components/toolbox_left/toolbox.directive.js"></script>
     <script type="application/javascript" src="components/properties_editor/properties-editor.directive.js"></script>
+
+    <script>
+      joint.shapes.devs.Model.prototype.initialize = function() {
+        this.updatePortsAttrs();
+        this.on('change:inPorts change:outPorts', this.updatePortsAttrs, this);
+        this._parent = (this._parent || this).constructor.__super__;
+        this._parent.initialize.apply(this, arguments);
+      }
+    </script>
   </head>
   <nav class="navbar navbar-inverse">
     <div class="container-fluid">
@@ -69,11 +78,11 @@
     <toolbox-left></toolbox-left>
 
     <!--  Middle editor area -->
-    <div jointjs-editor id="workflow" class="col-xs-10">
+    <div jointjs-editor id="workflow" class="col-xs-9">
     </div>
     
     <!-- Right side properties --->
-    <div component-properties-editor id="properties" class="col-xs-2 gradientborder stowed">
+    <div component-properties-editor id="properties" class="col-xs-3 gradientborder stowed">
       <!--<h2>Properties</h2>-->
       <!--<div ng-repeat="property in propertyEditorElement.properties">-->
         <!--<p>{{ property.name }}</p>-->

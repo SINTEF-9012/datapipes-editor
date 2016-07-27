@@ -34,15 +34,71 @@
   });*/
 
   /* Component element */
-  bigml.Component = joint.shapes.basic.Rect.extend({
+  bigml.Component = joint.shapes.devs.Model.extend({
+    portMarkup: '<g class="port<%= id %>"><circle class="port-body"/></g>',
+
+    addPort: function (port) {
+        console.log('add');
+        var arrayString = "";
+        if (port.type === "in")
+            arrayString = 'inPorts';
+        else if (port.type === "out")
+            arrayString = 'outPorts';
+      var portsArray = this.get(arrayString) || [];
+      this.set(arrayString, portsArray.concat([port.id]));
+    },
+    removePort: function (port) {
+        var arrayString = "";
+        console.log(port);
+        console.log(port.type);
+        if (port.type === "in")
+            arrayString = 'inPorts';
+        else if (port.type === "out")
+            arrayString = 'outPorts';
+
+        var portsArray = this.get(arrayString) || [];
+        console.log(portsArray);
+        var lg = portsArray.length;
+        for (var i = 0; i < lg; ++i) {
+            if (port.id === portsArray[i]) {
+                if (lg === 1) {
+                    this.set(arrayString, []);
+                }
+                console.log(i);
+                portsArray.splice(i, 1);
+                this.set(arrayString, portsArray);
+            }
+        }
+    },
+
     defaults: joint.util.deepSupplement({
-      type: 'bigml.Component'
-    }, joint.shapes.basic.Rect.prototype.defaults),
+      type: 'bigml.Component',
+      inPorts: [],
+      outPorts: [],
+      attrs: {
+        '.inPorts circle': {
+          r: 10,
+          stroke: '#ccc',
+          'stroke-width': 2,
+          magnet: 'passive',
+          type: 'input'
+        },
+        '.outPorts circle': {
+          r: 10,
+          stroke: '#ccc',
+          'stroke-width': 2,
+          magnet: true,
+          type: 'output'
+        }
+      }
+    }, joint.shapes.devs.Model.prototype.defaults),
     properties: [
       { name: 'Name', type: 'string', default: 'hello' }
     ]
   });
-    
+
+
+  bigml.ComponentView = joint.shapes.devs.ModelView;
   /* Data flow links */
   bigml.Dataflow = joint.dia.Link.extend({
     defaults: joint.util.deepSupplement({
@@ -54,21 +110,30 @@
           '.marker-target': {
             d: 'M 20 0 L 0 10 L 20 20 z'
           }
-        }
+        },
     }, joint.dia.Link.prototype.defaults)
   });
-  
+
+
   /* Composite element */
   bigml.Composite = bigml.Component.extend({
+    markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><text class="label"/><g class="inPorts"/><g class="outPorts"/></g>',
+
     defaults: joint.util.deepSupplement({
       type: 'bigml.Composite',
-      size: { width: 250, height: 250 },
+      inPorts: ['8080', '7070'],
+      outPorts: ['out1'],
+      size: { width: 200, height: 200 },
       originalSize: {width: 200, height:200},
       attrs: {
         'rect': {
           rx: 10,
           ry: 10,
           'stroke-dasharray': '5,5'
+        },
+        '.label': {
+          text: 'Composite',
+          'ref-y': -20
         }
       },
       // constructor to have an individual properties array (else it's shared)
@@ -82,10 +147,13 @@
             value: true
           }
         ];
-      }
-    }, joint.shapes.basic.Rect.prototype.defaults)
+      },
+    }, joint.shapes.bigml.Component.prototype.defaults)
   });
 
+
+
+  bigml.CompositeView = joint.shapes.devs.ModelView;
 
   /* Add to components list for GUI */
   mod.decorator('bigmlComponents', ['$delegate', function(components) {
