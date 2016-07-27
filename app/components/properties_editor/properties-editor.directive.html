@@ -5,6 +5,28 @@
         <input id="propertyInput" class="form-control" type="text" name="propertyValue" ng-model="property.value" placeholder={{property.default}}>
     </div>
 </form>
+<h3>Ports settings</h3>
+<div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th><th>Value</th><th class="text-danger">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="port in propertyEditorElement.ports">
+                <th>{{port.id}}</th>
+                <th>{{port.value}}</th>
+                <th class="danger"><a><i class="fa fa-trash-o text-danger"></i><a></th>
+            </tr>
+            <tr>
+                <th><button type="button" class="btn btn-success"> <i class="fa fa-plus-circle"></i></button></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
 <!-- Indicates a dangerous or potentially negative action -->
 <div class="buttonControl">

@@ -198,6 +198,7 @@
         });
         
         elem.on('drop', function(e) {
+          e.preventDefault();
           var jointEl = dragdrop.getJointjsElement(e.originalEvent.dataTransfer.getData('bigmlComponent'));
 
           // Creating jointJS element
@@ -209,6 +210,9 @@
 
           // positioning element
           el.position( e.originalEvent.offsetX-el.attributes.size.width/2, e.originalEvent.offsetY-el.attributes.size.height/2 );
+
+          console.log(e.originalEvent.offsetX-el.attributes.size.width/2);
+          console.log(e.originalEvent.offsetY-el.attributes.size.height/2);
 
           // add element to graph
           scope.jointGraph.addCell(el);
