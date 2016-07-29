@@ -2,7 +2,6 @@
     var bigml = joint.shapes.bigml;
     var mod = angular.module('bigmlEditor');
 
-
     /* Generic Control */
     bigml.Control = bigml.Component.extend({
         markup: '<g class="rotatable"><g class="scalable"><rect width="10" height="300" style="fill:rgb(0,0,0);stroke-width:3;stroke:rgb(0,0,0)" /><image x="36" y="56" width="64" height="64"></image></g><circle class="input" /><circle class="output" /></g>',
@@ -15,27 +14,9 @@
             attrs: {
                 'path.front': {
                     fill: '#666'
-                },
-                'circle.output': {
-                    r: 5,
-                    cx: 13,
-                    cy: 20,
-                    stroke: '#ccc',
-                    'stroke-width': 2,
-                    port: 'out',
-                    magnet: true
-                },
-                'circle.input': {
-                    r: 5,
-                    cx: -10,
-                    cy: 20,
-                    stroke: '#ccc',
-                    'stroke-width': 2,
-                    port: 'in',
-                    magnet: 'passive'
                 }
             }
-        }, joint.shapes.basic.Rect.prototype.defaults),
+        }, bigml.Component.prototype.defaults),
         properties: [
             {
                 name: 'URL'

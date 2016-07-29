@@ -66,12 +66,16 @@
           height: '100%',
           snapLinks: true,
           validateConnection: function(cellViewS, magnetS, cellViewT, magnetT, end, linkView) {
+
             // Prevent loop linking
-            if (magnetS && magnetS.getAttribute('type') === 'input') return false;
+            if (magnetS && magnetS.getAttribute('type') === 'input' && cellViewS.model.attributes.type !== 'bigml.Composite' ) return false;
             // Prevent linking from output ports to input ports within one element.
             if (cellViewS === cellViewT) return false;
+            if (cellViewS.model.attributes.type === 'bigml.Composite') {
+
+            }
             // Prevent linking to input ports.
-            return magnetT && magnetT.getAttribute('type') === 'input';
+            return (cellViewT.model.attributes.type === 'bigml.Composite') || (magnetT && magnetT.getAttribute('type') === 'input');
           },
           validateMagnet: function(cellView, magnet) {
             // Note that this is the default behaviour. Just showing it here for reference.
@@ -80,8 +84,7 @@
           },
           // Enable link snapping within 75px lookup radius
           snapLinks: { radius: 75 },
-          defaultLink: new joint.shapes.bigml.Dataflow,
-          async: true
+          defaultLink: new joint.shapes.bigml.Dataflow
         });
         $(scope.jointPaper.svg).css('background-color','white');
 
