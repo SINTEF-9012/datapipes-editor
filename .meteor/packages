@@ -23,3 +23,8 @@ jagi:astronomy
 fortawesome:fontawesome
 twbs:bootstrap
 session
+kadira:flow-router
+kadira:blaze-layout
+zimme:active-route
+accounts-password
+accounts-ui

@@ -3,10 +3,25 @@
 </head>
 
 <body>
+  <div class="row">
+    {{> leftbar }}
+    {{#if currentUser }}
+      {{> mainarea }}
+      {{> rightbar }}
+    {{else}}
+      <div class="col-xs-10 loginwarning">
+        <div class="alert alert-danger">
+          You have to <b>log in</b> to do anyting!
+        </div>
+      </div>
+    {{/if}}
+  </div>
+  <!--
   {{> topbar}}
   {{> toolbox}}
   {{> canvasMain}}
   {{> bottombar}}
+  -->
 </body>
 
 

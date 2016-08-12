@@ -1,0 +1,35 @@
+<template name="leftbar">
+  <div id="sidebar" class="col-xs-2 gradientborder">
+    <h1>BigML</h1>
+    <div class="user">User: {{> loginButtons}}</div>
+    
+    {{#if currentUser}}
+      <ul class="nav nav-pills">
+        <li class="{{isActiveRoute 'monitor'}}"><a href="/monitor/">Monitor</a></li>
+        <li class="{{isActiveRoute 'editor'}}"><a href="/editor/">Editor</a></li>
+      </ul>
+    
+      {{#if isActiveRoute 'editor'}}
+        <h2>Components</h2>
+        {{> toolbox }}
+      {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="mainarea">
+  <div id="mainarea" class="col-xs-10">
+    {{#if isActiveRoute 'editor'}}
+      {{> editorcanvas }}
+    {{/if}}
+    {{#if isActiveRoute 'monitor'}}
+      {{> canvas }}
+    {{/if}}
+  </div>
+</template>
+
+<template name="rightbar">
+  <div id="properties" class="col-xs-2 gradientborder stowed">
+    <h2>Properties</h2>
+  </div>
+</template>

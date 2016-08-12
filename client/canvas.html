@@ -1,0 +1,13 @@
+<template name="canvas">
+  <svg style="width:100%;height:800px">
+    {{#each component in components}}
+      {{#with component}}
+        {{> Template.dynamic template=getTemplateName }}
+      {{/with}}
+    {{/each}}
+  </svg>
+</template>
+
+<template name="editorcanvas">
+  {{> canvas }}
+</template>

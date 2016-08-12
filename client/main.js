@@ -8,7 +8,14 @@ import './main.html';
 import { BigmlComponent } from '/imports/components/basic.js';
 import ComponentsList from '/imports/components/list.js';
 
-Session.set('state', 'monitor');
+/* Setup user accounts */
+import { Accounts } from 'meteor/accounts-base';
+ 
+Accounts.ui.config({
+  passwordSignupFields: 'USERNAME_ONLY',
+});
+
+
 Template.toolbox.helpers({
   list() {
     var list = [];
