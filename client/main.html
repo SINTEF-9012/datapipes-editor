@@ -1,0 +1,40 @@
+<head>
+  <title>BigML editor</title>
+</head>
+
+<body>
+  {{> topbar}}
+  {{> toolbox}}
+  {{> canvasMain}}
+  {{> bottombar}}
+</body>
+
+
+<template name="toolboxthumbnail">
+  <div draggable="true">
+    <svg>
+      {{> Template.dynamic template=getTemplateName }}
+    </svg>
+  </div>
+</template>
+
+<template name="toolbox">
+  <div class="toolbox">
+    {{#each component in list}}
+      {{> toolboxthumbnail component}}
+    {{/each}}
+  </div>
+</template>
+
+<template name="bottombar">
+    <div class="control-bar-bottom">
+        <div class="right-block">
+            <div class="event-log">
+                <button type="button" class="btn btn-default">Event Log</button>
+            </div>
+            <div class="branch-selector">
+                <button type="button" class="btn btn-success"><i class="fa fa-plus"></i></button>
+            </div>
+        </div>
+    </div>
+</template>

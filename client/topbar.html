@@ -1,0 +1,65 @@
+<template name="topbar">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+
+            <ul class="nav navbar-nav col-md-4">
+                <li><a href=""><i class="fa fa-cloud-download"></i> Import</a></li>
+                <li><a href=""><i class="fa fa-cloud-upload"></i> Export</a></li>
+            </ul>
+            <div class="col-md-4" style="vertical-align:middle; padding-top: 8px; text-align:center;">
+                <div class="btn-group " role="group">
+                    <button type="button" class="btn btn-default" id="monitor-mode-button">Monitor Mode</button>
+                    <button type="button" class="btn btn-default" id="editor-mode-button">Editor Mode</button>
+                </div>
+                <button type="button" class="btn btn-success" id="save-button">Commit</button>
+            </div>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"><i class="fa fa-question-circle"></i> Help</a></li>
+                <li class="dropdown">
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Settings</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Log Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+    {{> commitNameModalTemplate}}
+</template>
+
+<template name="commitNameModalTemplate">
+    <div class="modal fade" id="commitModal">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Commit Settings</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="commitOwnerName">Name</label>
+                            <input type="text" class="form-control" id="commitOwnerName" placeholder="Your name..."/>
+                        </div>
+                        <div class="form-group">
+                            <label for="commitDescription">Description</label>
+                            <textarea id="commitDescription" class="form-control" placeholder="Short description of what you've done"></textarea>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="merge">Commit + Merge</button>
+                    <button type="button" class="btn btn-primary" id="commitOnly">Commit Only</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</template>

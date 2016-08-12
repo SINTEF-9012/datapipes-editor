@@ -1,0 +1,28 @@
+/* CSS declarations go here */
+
+div.toolbox > div {
+  display: inline-block;
+}
+
+div.toolbox svg {
+  width: 100px;
+  height: 100px;
+}
+
+.control-bar-bottom {
+  position:fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: whitesmoke;
+  color: white;
+  border-top: solid darkslategray 1px;
+  padding: 10px;
+}
+
+.right-block {
+  float:right;
+}
+.control-bar-bottom div {
+  display: inline-block;
+}

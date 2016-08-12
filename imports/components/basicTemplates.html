@@ -1,0 +1,19 @@
+<template name="bigml.component">
+  <g id={{_id}}>
+    <rect {{svgAttributes}} rx="10" ry="10" stroke="black" stroke-width="2" fill="white"/>
+    <text x={{location.x}} y={{location.y}} text-anchor="middle" alignment-baseline="central" font-size=10>{{type}}</text>
+  </g>
+</template>
+
+<template name="bigml.compositecomponent">
+  <g id={{_id}}>
+    <rect {{svgAttributes}} rx="10" ry="10" stroke="black" stroke-width="2" stroke-dasharray="10,5" fill="white"/>
+    <text x={{location.x}} y={{location.y}} text-anchor="middle" alignment-baseline="central" font-size=10>{{type}}</text>
+  </g>
+</template>
+
+<template name="bigml.storagesystem">
+  <g id={{_id}}>
+    <circle {{svgAttributes}} fill="red" stroke="black" stroke-width="2"/>
+  </g>
+</template>
