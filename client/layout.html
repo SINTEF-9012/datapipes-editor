@@ -1,4 +1,5 @@
 <template name="leftbar">
+  
   <div id="sidebar" class="col-xs-2 gradientborder">
     <h1>BigML</h1>
     <div class="user">User: {{> loginButtons}}</div>
@@ -10,7 +11,12 @@
       </ul>
     
       {{#if isActiveRoute 'editor'}}
-        <h2>Components</h2>
+        <h3>Branch</h3>
+        <button type="button" class="btn btn-default">Create new</button>
+        <button type="button" class="btn btn-default">Save</button>
+        <button type="button" class="btn btn-default">Push to master</button>
+        
+        <h3>Components</h3>
         {{> toolbox }}
       {{/if}}
     {{/if}}
@@ -20,10 +26,10 @@
 <template name="mainarea">
   <div id="mainarea" class="col-xs-10">
     {{#if isActiveRoute 'editor'}}
-      {{> editorcanvas }}
+      {{> editorcanvas masterHead }}
     {{/if}}
     {{#if isActiveRoute 'monitor'}}
-      {{> canvas }}
+      {{> canvas masterHead }}
     {{/if}}
   </div>
 </template>

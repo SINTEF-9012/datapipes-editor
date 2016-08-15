@@ -1,87 +1,132 @@
-import { Class, Type } from 'meteor/jagi:astronomy';
+import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import { BigmlElement} from '/imports/components/basic.js';
+import { Class, Type, Validator } from 'meteor/jagi:astronomy';
+
+import { BigmlElement } from '/imports/components/basic.js';
 
 const Branches = new Mongo.Collection('branches');
 
+
+
 const Version = Class.create({
-    name: 'version',
-    typeField: 'type',
-    secured: false,
-    fields: {
-        description: {
-            type: String,
-            default: 'No description'
-        },
-        owner: {
-            type: String,
-            default: 'Anonymous'
-        },
-        timestamp: {
-            type: Date,
-            default() { return new Date();}
-        },
-        prevVersions: {
-            type: [String],
-            default() { return[]; }
-        },
-        changes: {
-            type: [Object],
-            default() { return []; }
-        },
-        elements: {
-            type: [BigmlElement],
-            default() { return [];}
-        }
-    }
-});
-
-const Branch = Class.create({
-    name: 'branch',
-    collection: Branches,
-    typeField: 'type',
-    secured: false,
-    fields: {
-        name: {
-            type: String,
-            default: 'Temporary'
-        },
-        owner: {
-            type: String,
-            default:'Anonymous'
-        },
-        versions: {
-            type: [Version],
-            default() { return []; }
-        }
+  name: 'version',
+  fields: {
+    '_id': {
+      type: Mongo.ObjectID,
+      default() { return new Mongo.ObjectID(); }
     },
-    methods: {
-        merge: function(description, ownerName) {
-            console.log("MERGE NOT IMPLEMENTED YET");
-        },
-        commit: function(description, ownerName) {
-            console.log("COMMIT NOT IMPLEMENTED YET");
-        },
-        pullMaster: function() {
-            console.log("PULL NOT IMPLEMENTED YET");
-        },
-        lastVersion: function() {
-            return this.versions.reduce(function(pre, cur) {
-                return Date.parse(pre.timestamp) > Date.parse(cur.timestamp) ? pre : cur;
-            })
-        },
-        init: function() {
-            this.elements = Branch.find({name: 'master'}).lastVersion().elements;
-        }
+    description: {
+      type: String,
+      default: 'No description'
+    },
+    timestamp: {
+      type: Date,
+      immutable: true,
+      default() { return new Date(); }
+    },
+    previous: {
+      type: Mongo.ObjectID,
+      immutable: true,
+      optional: true
+    },
+    mergedFrom: {
+      type: Mongo.ObjectID,
+      immutable: true,
+      optional: true,
+    },
+    changes: {
+      type: [Object],
+      default() { return []; }
+    },
+    elements: {
+      type: [BigmlElement],
+      default() { return []; }
     }
+  },
+  events: {
+    beforeInsert(e) {
+      e.target.timestamp = new Date();
+    },
+    afterInit(e) {
+      e.target.save = function() {
+        if (!this._parentBranch)
+          console.error('save(): No parent branch set!');
+        this._parentBranch.save();
+      };
+      e.target.elements.forEach(el => {
+        el._parentVersion = e.target;
+      });
+    }
+  }
 });
 
-Branch.getMasterHead = function () {
-    return Branch.getMasterBranch().lastVersion();
+var getUserId = function() {
+  try {
+    return Meteor.userId();
+  } catch (e) {
+    return '';
+  }
 };
 
+const Branch = Class.create({
+  name: 'branch',
+  collection: Branches,
+  typeField: 'type',
+  secured: false,
+  fields: {
+    name: {
+      type: String,
+      default: 'Temporary'
+    },
+    owner: {
+      type: String,
+      default: getUserId,
+      immutable: true
+    },
+    versions: {
+      type: [Version],
+      default() { return []; }
+    }
+  },
+  events: {
+    beforeInsert(e) {
+      this.owner = getUserId();
+    },
+    afterInit(e) {
+      e.target.versions.forEach(v => {
+        v._parentBranch = e.target;
+      });      
+    }
+  },
+  methods: {
+    merge: function(description, ownerName) {
+      console.error("MERGE NOT IMPLEMENTED YET");
+    },
+    commit: function(description, ownerName) {
+      console.error("COMMIT NOT IMPLEMENTED YET");
+    },
+    pullMaster: function() {
+      console.error("PULL NOT IMPLEMENTED YET");
+    },
+    lastVersion: function() {
+      return this.versions.reduce(function(pre, cur) {
+        return Date.parse(pre.timestamp) > Date.parse(cur.timestamp) ? pre : cur;
+      })
+    },
+    init: function() {
+      this.elements = Branch.find({name: 'master'}).lastVersion().elements;
+    }
+  }
+});
+
 Branch.getMasterBranch = function () {
-    return Branch.findOne('masterID');
+    return Branch.findOne('master');
 }
+
+Branch.getMasterHead = function () {
+    var master = Branch.getMasterBranch();
+    if (master)
+        return master.lastVersion();
+};
 
 export { Branch, Version };

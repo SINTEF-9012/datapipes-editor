@@ -1,4 +1,5 @@
 import { Class } from 'meteor/jagi:astronomy';
+import { Mongo } from 'meteor/mongo';
 
 if (Meteor.isClient) {
   import '/imports/components/basicTemplates.html'
@@ -14,27 +15,6 @@ const BigmlProperty = Class.create({
     }
   }
 });
-/*
-const canvas = Class.create({
-  name:'canvas',
-  fields: {
-    objets: {
-      type: [BigmlGraphic],
-      default() {
-        return [];
-      }
-    }
-  }
-})
-
-const BigmlGraphic = Class.create({
-  name: 'assoc',
-  collection: 'elem.graphic',
-  fields: {
-    element: BigmlElement,
-    design: ...
-  }
-})*/
 
 const BigmlElement = Class.create({
   name: 'bigml.element',
@@ -48,6 +28,15 @@ const BigmlElement = Class.create({
     properties: {
       type: [BigmlProperty],
       default() { return []; }
+    }
+  },
+  events: {
+    afterInit(e) {
+      e.target.save = function() {
+        if (!this._parentVersion)
+          console.error('save(): No parent version set!');
+        this._parentVersion.save();
+      };
     }
   }
 });
@@ -150,7 +139,7 @@ const BigmlCompositeComponent = BigmlManagedComponent.inherit({
   name: 'bigml.compositecomponent',
   fields: {
     children: {
-      type: [Mongo.ObjectID],
+      type: [BigmlComponent],
       default() { return []; }
     }
   }

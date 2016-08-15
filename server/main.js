@@ -1,9 +1,18 @@
 import { Meteor } from 'meteor/meteor';
-
-import { BigmlComponent } from '/imports/components/basic.js';
-import { Branch } from '/imports/synchronization/version.js';
+import { Branch, Version } from '/imports/synchronization/version.js';
 
 Meteor.startup(() => {
-  // code to run on server at startup
-
+  var master = Branch.findOne('master');
+  
+  if (!master) {
+    // Create a default master branch
+    master = new Branch();
+    master._id = 'master';
+    master.name = 'Master';
+    
+    // Create an empty first version
+    master.versions.push(new Version());
+    
+    master.save();
+  }
 });

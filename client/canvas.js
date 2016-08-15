@@ -1,14 +1,12 @@
 import { Template } from 'meteor/templating';
 import { Class, Type } from 'meteor/jagi:astronomy';
 
-import { Branch, Version, Branches } from '/imports/synchronization/version.js';
+import { Branch, Version } from '/imports/synchronization/version.js';
 import { ComponentsList } from '/imports/components/list.js';
 import { BigmlComponent } from '/imports/components/basic.js';
 
 import { propertiesElement } from '/client/rightbar.js';
 import { attachMouseMove } from '/client/utils.js';
-
-window.BigmlComponent = BigmlComponent;
 
 /* Type to class mappings */
 var typeClassMap = {};
@@ -17,8 +15,11 @@ ComponentsList.forEach((component) => {
 });
 
 Template.canvasElements.helpers({
-  components() { // Monitoring mode components
-    return Branch.getMasterHead().elements;
+  components() {
+    if (this && this.lastVersion)
+      return this.lastVersion().elements;
+    else
+      return [];
   },
   getTemplateName() {
     var type = Type.types[this.type];
@@ -48,13 +49,9 @@ Template.editorcanvas.events({
         // Set position of element on canvas
         obj.location.x = event.originalEvent.offsetX;
         obj.location.y = event.originalEvent.offsetY;
-        //obj.save();
-        var br = Branch.getMasterBranch()
-        br.lastVersion().elements.push(obj);
-        console.log(br.lastVersion().elements);
-        br.save();
-      } else {
-        console.log('What ?! element is not an instance of BigmlComponent');
+        // Add component to current version
+        this.elements.push(obj);
+        this.save();
       }
     }
   },
