@@ -4,13 +4,18 @@ import { Class, Type } from 'meteor/jagi:astronomy';
 import { ComponentsList } from '/imports/components/list.js';
 import { BigmlComponent } from '/imports/components/basic.js';
 
+import { propertiesElement } from '/client/rightbar.js';
+import { attachMouseMove } from '/client/utils.js';
+
+window.BigmlComponent = BigmlComponent;
+
 /* Type to class mappings */
 var typeClassMap = {};
 ComponentsList.forEach((component) => {
   typeClassMap[component.className] = component;
 });
 
-Template.canvas.helpers({
+Template.canvasElements.helpers({
   components() { // Monitoring mode components
     return BigmlComponent.find();
   },
@@ -29,6 +34,7 @@ Template.canvas.helpers({
 
 
 Template.editorcanvas.events({
+  /* --- Drag-drop new elements onto canvas --- */
   'dragover'(event) {
     event.preventDefault();
   },
@@ -46,20 +52,32 @@ Template.editorcanvas.events({
       }
     }
   },
+  /* --- Moving components on the canvas --- */
   'mousedown g'(e, template) {
-    template.dragging = this;
+    e.preventDefault();
+    
+    var element = this;
+    var svg = template.find('svg');
+
+    var move = function(e) {
+      element.location.x += e.movementX;
+      element.location.y += e.movementY;
+      element.save();
+    };
+    attachMouseMove(svg, move);
   },
-  'mousemove'(event,template) {
-    if (template.dragging) {
-      template.dragging.location.x += event.originalEvent.movementX;
-      template.dragging.location.y += event.originalEvent.movementY;
-      template.dragging.save();
-    }
-  },
-  'mouseup'(e,template) {
-    template.dragging = null;
-  },
+  /* --- Removing components from the canvas --- */
   'dblclick' (e) {
     this.remove();
+  },
+  /* --- Show/hide the properties bar on the right side --- */
+  'contextmenu g'(e, template) {
+    e.preventDefault();
+    propertiesElement.set(this);
+    window.testElem = this;
+  },
+  'contextmenu'(e, template) {
+    e.preventDefault();
+    propertiesElement.set(undefined);
   }
 });

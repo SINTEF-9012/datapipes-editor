@@ -59,6 +59,7 @@ html, body, body > div {
 #properties {
   border-width: 0 0 0 1px;
   background-color: white;
+  height: 100%;
 
   position: absolute;
   right: 0;
