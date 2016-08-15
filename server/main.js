@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 
-import { Elements } from '/imports/datastore.js';
 import { BigmlComponent } from '/imports/components/basic.js';
+import { Branch } from '/imports/synchronization/version.js';
 
 Meteor.startup(() => {
   // code to run on server at startup

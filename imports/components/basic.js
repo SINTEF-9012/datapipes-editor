@@ -1,5 +1,4 @@
 import { Class } from 'meteor/jagi:astronomy';
-import { Local } from '/imports/datastore.js';
 
 if (Meteor.isClient) {
   import '/imports/components/basicTemplates.html'
@@ -39,7 +38,6 @@ const BigmlGraphic = Class.create({
 
 const BigmlElement = Class.create({
   name: 'bigml.element',
-  collection: Local,
   typeField: 'type',
   secured: false,
   fields: {
