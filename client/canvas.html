@@ -1,7 +1,7 @@
 <template name="canvasElements">
   {{#each component in elements}}
     {{#with component}}
-      {{> Template.dynamic template=getTemplateName }}
+      {{> Template.dynamic template=getBigmlComponentTemplate }}
     {{/with}}
   {{/each}}
 </template>

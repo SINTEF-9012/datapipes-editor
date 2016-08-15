@@ -54,7 +54,7 @@ const Version = Class.create({
         this._parentBranch.save();
       };
       e.target.elements.forEach(el => {
-        el._parentVersion = e.target;
+        el._parent = e.target;
       });
     }
   }

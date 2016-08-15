@@ -9,6 +9,13 @@
   <g id={{_id}}>
     <rect {{svgAttributes}} rx="10" ry="10" stroke="black" stroke-width="2" stroke-dasharray="10,5" fill="white"/>
     <text x={{location.x}} y={{location.y}} text-anchor="middle" alignment-baseline="central" font-size=10>{{name}}</text>
+    <g class="compositeChildren">
+      {{#each component in children}}
+        {{#with component}}
+          {{> Template.dynamic template=getBigmlComponentTemplate }}
+        {{/with}}
+      {{/each}}
+    </g>
     <rect class="resize" {{resizeAttributes}} fill="transparent" style="cursor:se-resize"/>
   </g>
 </template>

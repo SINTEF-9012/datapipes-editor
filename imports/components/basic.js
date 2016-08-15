@@ -30,12 +30,17 @@ const BigmlElement = Class.create({
       default() { return []; }
     }
   },
+  methods: {
+    parent() {
+      return this._parent;
+    }
+  },
   events: {
     afterInit(e) {
       e.target.save = function() {
-        if (!this._parentVersion)
-          console.error('save(): No parent version set!');
-        this._parentVersion.save();
+        if (!this._parent)
+          console.error('save(): No parent set!');
+        this._parent.save();
       };
     }
   }
@@ -139,8 +144,15 @@ const BigmlCompositeComponent = BigmlManagedComponent.inherit({
   name: 'bigml.compositecomponent',
   fields: {
     children: {
-      type: [BigmlComponent],
+      type: [BigmlManagedComponent],
       default() { return []; }
+    }
+  },
+  events: {
+    afterInit(e) {
+      e.target.children.forEach(c => {
+        c._parent = e.target;
+      });
     }
   }
 });

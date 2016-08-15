@@ -1,21 +1,33 @@
 <template name="leftbar">
-  
   <div id="sidebar" class="col-xs-2 gradientborder">
     <h1>BigML</h1>
     <div class="user">User: {{> loginButtons}}</div>
-    
+
     {{#if currentUser}}
       <ul class="nav nav-pills">
         <li class="{{isActiveRoute 'monitor'}}"><a href="/monitor/">Monitor</a></li>
         <li class="{{isActiveRoute 'editor'}}"><a href="/editor/">Editor</a></li>
       </ul>
-    
+
       {{#if isActiveRoute 'editor'}}
         <h3>Branch</h3>
-        <button type="button" class="btn btn-default">Create new</button>
-        <button type="button" class="btn btn-default">Save</button>
-        <button type="button" class="btn btn-default">Push to master</button>
-        
+        <div style="text-align:center">
+          <form style="width:92%;margin:auto">
+            <div class="form-group">
+              <select class="form-control">
+                <option>Master</option>
+                <option>Branch 1</option>
+                <option>Branch 2</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div style="text-align:center">
+          <button type="button" class="btn btn-default" style="width:30%">Create new</button>
+          <button type="button" class="btn btn-default" style="width:30%">Save</button>
+          <button type="button" class="btn btn-default" style="width:30%">Push to master</button>
+        </div>
+
         <h3>Components</h3>
         {{> toolbox }}
       {{/if}}
