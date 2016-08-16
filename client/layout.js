@@ -6,6 +6,10 @@ Template.leftbar.events({
   'click ul.nav>li>a'(event) {
     event.preventDefault();
     FlowRouter.go(event.target.getAttribute('href'));
+  },
+  'click #button-create-new-branch'(event) {
+      event.preventDefault();
+      Branch.createNewBranch();
   }
 });
 
