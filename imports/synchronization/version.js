@@ -165,6 +165,18 @@ function createNewBranchFct() {
     // TODO return a promise ?
 }
 
+function createNewBranchFct(branchName) {
+    let newBranch = new Branch();
+    newBranch.name = branchName;
+    let newVersion = new Version();
+    newVersion.previous = Branch.getMasterHead()._id;
+    newVersion.elements = newVersion.previous.elements;
+    newBranch.versions.push(newVersion);
+    newBranch.save((err, id) => {
+        return Branch.findOne(id);
+    });
+}
+
 function getMasterBranchFct() {
     return Branch.findOne('master');
 }
