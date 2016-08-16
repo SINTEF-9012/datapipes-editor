@@ -1,5 +1,5 @@
 <template name="popups">
-  {{>popupNewBranch}}
+  {{>popupNewBranch newContext}}
 </template>
 
 <template name="popupNewBranch">
@@ -11,11 +11,16 @@
           <h4>Create new branch</h4>
         </div>
         <div class="modal-body">
-          <p>Create a new branch...</p>
+          <form>
+            <div class="form-group">
+              <label for="popupNewBranchName">Please input a name:</label>
+              <input type="text" class="form-control" id="popupNewBranchName" placeholder="Branch name" value="{{name}}">
+            </div>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary">Create</button>
+          <button type="button" class="btn btn-primary create" disabled="{{notHasName}}">Create</button>
         </div>
       </div>
     </div>

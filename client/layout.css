@@ -76,3 +76,7 @@ html, body, body > div {
   margin-top: 50px;
   margin-left: 20px;
 }
+
+#mainarea {
+  height: 100%;
+}

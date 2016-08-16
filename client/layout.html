@@ -7,29 +7,33 @@
       <ul class="nav nav-pills">
         <li class="{{isActiveRoute 'monitor'}}"><a href="/monitor/">Monitor</a></li>
         <li class="{{isActiveRoute 'editor'}}"><a href="/editor/">Editor</a></li>
+        <li class="{{isActiveRoute 'history'}}"><a href="/history/">History</a></li>
       </ul>
-
-      {{#if isActiveRoute 'editor'}}
+      {{#if or (isActiveRoute 'editor') (isActiveRoute 'history')}}
         <h3>Branch</h3>
         <div style="text-align:center">
           <form style="width:92%;margin:auto">
             <div class="form-group">
               <select class="form-control">
-                <option>Master</option>
-                <option>Branch 1</option>
-                <option>Branch 2</option>
+                {{#each branch in branches}}
+                  <option selected={{isSelectedBranch branch}}>{{branch}}</option>
+                {{/each}}
               </select>
             </div>
           </form>
         </div>
+      {{/if}}
+      {{#if isActiveRoute 'editor'}}
         <div style="text-align:center">
-          <button type="button" class="btn btn-default" style="width:30%">Create new</button>
-          <button type="button" class="btn btn-default" style="width:30%">Save</button>
-          <button type="button" class="btn btn-default" style="width:30%">Push to master</button>
+          <button type="button" class="btn btn-default new" style="width:30%" disabled="{{notMasterBranchSelected}}">Create new</button>
+          <button type="button" class="btn btn-default save" style="width:30%" disabled="{{masterBranchSelected}}">Save</button>
+          <button type="button" class="btn btn-default push" style="width:30%" disabled="{{masterBranchSelected}}">Push to master</button>
         </div>
 
-        <h3>Components</h3>
-        {{> toolbox }}
+        {{#unless masterBranchSelected}}
+          <h3>Components</h3>
+          {{> toolbox }}
+        {{/unless}}
       {{/if}}
     {{/if}}
   </div>
@@ -38,7 +42,9 @@
 <template name="mainarea">
   <div id="mainarea" class="col-xs-10">
     {{#if isActiveRoute 'editor'}}
-      {{> editorcanvas masterHead }}
+      {{#if masterBranchSelected }}
+        {{> canvas masterHead }}
+      {{/if}}
     {{/if}}
     {{#if isActiveRoute 'monitor'}}
       {{> canvas masterHead }}
