@@ -126,6 +126,7 @@ const Branch = Class.create({
             newVersion.elements = oldVersion.elements;
             newVersion.previous = oldVersion._id;
             this.versions.push(newVersion);
+            this.save();
             return newVersion;
         },
         rollback: function (idBranch) {

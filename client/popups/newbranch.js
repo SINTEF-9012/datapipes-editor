@@ -1,15 +1,10 @@
 import { Template } from 'meteor/templating';
-import { ReactiveDict } from 'meteor/reactive-dict';
 
 import { Branch, Version } from '/imports/synchronization/version.js';
-
-Template.popups.helpers({
-  newContext() { return new ReactiveDict(); }
-});
+import { selectedBranch } from '/client/branch.js';
 
 Template.popupNewBranch.events({
   'shown.bs.modal .modal'(event,template) {
-    console.log('Modal shown!');
     template.find('input').focus();
   },
   'keyup input, change input'(event,template) {
@@ -19,7 +14,7 @@ Template.popupNewBranch.events({
     event.preventDefault();
     // Create the new branch
     var branch = Branch.createNewBranch(this.get('name'));
-    console.log(branch);
+    selectedBranch.set(branch._id);    
     
     // Close dialog
     this.set('name','');

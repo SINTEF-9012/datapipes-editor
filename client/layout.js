@@ -4,6 +4,8 @@ import { Blaze } from 'meteor/blaze';
 import { Branch, Version } from '/imports/synchronization/version.js';
 import { selectedBranch } from '/client/branch.js';
 
+import { PopupShow } from '/client/popups/popups.js';
+
 Template.leftbar.events({
   'click ul.nav>li>a'(event) {
     event.preventDefault();
@@ -13,13 +15,13 @@ Template.leftbar.events({
     selectedBranch.set(template.find('select').value);
   },
   'click button.new'(event) {
-    $('#popupNewBranch').modal();
+    PopupShow('newbranch');
   },
   'click button.save'(event) {
-    console.log('Save branch!');
+    Branch.findOne(selectedBranch.get()).commit();
   },
   'click button.push'(event) {
-    console.log('Push branch!');
+    PopupShow('merge', { some: 'thing' });
   }
 });
 
