@@ -1,0 +1,9 @@
+const {elementName} = Class.create({
+    name: 'bigml.{elementName}',
+    fields: {
+        {#attributes}{attributeName}: {
+            type: {type},
+            {default}
+        }{/attributes}
+    }
+});
