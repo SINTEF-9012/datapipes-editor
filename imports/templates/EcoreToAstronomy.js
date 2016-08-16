@@ -37,7 +37,7 @@ try {
                 attribute.attributeName = f.get('name');
                 var eType = f.get('eType').get('name');
                 if (f.isTypeOf('EReference')) {
-                    attribute.type = eType;
+                    attribute.type = "["+eType+"]";
                     attribute.default = "default() { return []; }"
                 } else {
                     attribute.default = "default: ''"
