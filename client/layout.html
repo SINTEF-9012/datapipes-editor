@@ -16,7 +16,7 @@
             <div class="form-group">
               <select class="form-control">
                 {{#each branch in branches}}
-                  <option selected={{isSelectedBranch branch}}>{{branch}}</option>
+                  <option selected={{isSelectedBranch branch}} value="{{branch._id}}">{{branch.name}}</option>
                 {{/each}}
               </select>
             </div>
@@ -44,6 +44,8 @@
     {{#if isActiveRoute 'editor'}}
       {{#if masterBranchSelected }}
         {{> canvas masterHead }}
+      {{else}}
+        {{> editorcanvas currentHead}}
       {{/if}}
     {{/if}}
     {{#if isActiveRoute 'monitor'}}

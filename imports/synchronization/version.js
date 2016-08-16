@@ -163,6 +163,7 @@ function createNewBranchFct() {
         return Branch.findOne(id);
     });
     // TODO return a promise ?
+    return newBranch;
 }
 
 function createNewBranchFct(branchName) {
@@ -175,6 +176,7 @@ function createNewBranchFct(branchName) {
     newBranch.save((err, id) => {
         return Branch.findOne(id);
     });
+    return newBranch;
 }
 
 function getMasterBranchFct() {

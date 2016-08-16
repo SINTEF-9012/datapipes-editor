@@ -1,4 +1,5 @@
 import { FlowRouter } from 'meteor/kadira:flow-router';
+import { Blaze } from 'meteor/blaze';
 
 import { Branch, Version } from '/imports/synchronization/version.js';
 import { selectedBranch } from '/client/branch.js';
@@ -24,18 +25,26 @@ Template.leftbar.events({
 
 Template.leftbar.helpers({
   branches() {
-    return [ 'Master', 'Branch 1', 'Branch 2', 'Branch 3' ];
+    return Branch.getUserBranches();
   },
   selectedBranch() {
     return selectedBranch.get();
   },
   isSelectedBranch(branch) {
-    return selectedBranch.get() == branch;
+    if (selectedBranch.get() == undefined)
+      return branch._id == 'master';
+    else
+      return selectedBranch.get() == branch._id;
   }
 });
 
 Template.mainarea.helpers({
   masterHead() {
     return Branch.getMasterHead();
+  },
+  currentHead() {
+    var branch = Branch.findOne(selectedBranch.get());
+    if (branch)
+      return branch.lastVersion();
   }
 });
