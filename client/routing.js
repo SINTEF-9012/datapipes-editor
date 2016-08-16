@@ -17,3 +17,9 @@ FlowRouter.route('/editor/', {
   action() {
   }
 });
+
+FlowRouter.route('/history/', {
+  name: 'history',
+  action() {
+  }
+});

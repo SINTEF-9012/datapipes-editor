@@ -55,45 +55,8 @@ Template['bigml.compositecomponent'].events({
       attachMouseMove(svg, resize);
     }
   },
-  /*
-  'mousedown rect.resize'(e, template) {
-    e.stopPropagation();
-    template.resizing = true;
-    window.tempTemp = template;
-    console.log(template);
-    var parent = template.findParentTemplate('canvas');
-    console.log(parent);
-  },
-  'mousemove'(e,template) {
-    if (template.resizing) {
-      this.location.x += e.originalEvent.movementX/2;
-      this.location.y += e.originalEvent.movementY/2;
-      this.location.width += e.originalEvent.movementX;
-      this.location.height += e.originalEvent.movementY;
-      this.save();
-    }
-  },
-  'mouseup, mouseout'(e,template) {
-    template.resizing = false;
-    console.log('Stopped resizing');
-  }
-  */
 });
-/*
-  'mousedown g'(e, template) {
-    template.dragging = this;
-  },
-  'mousemove'(event,template) {
-    if (template.dragging) {
-      template.dragging.location.x += event.originalEvent.movementX;
-      template.dragging.location.y += event.originalEvent.movementY;
-      template.dragging.save();
-    }
-  },
-  'mouseup'(e,template) {
-    template.dragging = null;
-  },
-*/
+
 
 Template['bigml.storagesystem'].helpers({
   svgAttributes() {

@@ -1,3 +1,5 @@
+import { Template } from 'meteor/templating';
+
 /**
  * Get the parent template instance
  * @param {Number} [levels] How many levels to go up. Default is 1
@@ -31,6 +33,21 @@ Blaze.TemplateInstance.prototype.findParentTemplate = function (name) {
   return parent;
 };
 
+
+/* --- Some logic global helper functions --- */
+var mapArguments = function(args) {
+  return Array.prototype.reduce.call(args,(prev,next) => {
+    if (!(next instanceof Spacebars.kw))
+      prev.push(next);
+    return prev;
+  },[]);
+};
+Template.registerHelper('or', function() {
+  var input = mapArguments(arguments);
+  return input.reduce((prev,next) => {
+    return prev || next;
+  },false);
+});
 
 
 

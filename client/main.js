@@ -5,6 +5,7 @@ import { Type } from 'meteor/jagi:astronomy';
 
 import './main.html';
 
+import { Branch, Version } from '/imports/synchronization/version.js';
 import { BigmlComponent } from '/imports/components/basic.js';
 import ComponentsList from '/imports/components/list.js';
 
@@ -54,5 +55,11 @@ Template.toolboxthumbnail.helpers({
       return type.name;
     else
       return undefined;
+  }
+});
+
+Template.body.helpers({
+  masterHead() {
+    return Branch.getMasterHead();
   }
 });
