@@ -21,7 +21,8 @@ Template.leftbar.events({
     Branch.findOne(selectedBranch.get()).commit();
   },
   'click button.push'(event) {
-    PopupShow('merge', { some: 'thing' });
+    Branch.findOne(selectedBranch.get()).pull();
+    //PopupShow('merge', { some: 'thing' });
   }
 });
 

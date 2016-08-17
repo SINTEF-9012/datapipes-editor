@@ -21,6 +21,12 @@ const BigmlElement = Class.create({
   typeField: 'type',
   secured: false,
   fields: {
+    '_id': {
+      type: Mongo.ObjectID,
+      default() {
+        return new Mongo.ObjectID();
+      }
+    },
     name: {
       type: String,
       default: ''

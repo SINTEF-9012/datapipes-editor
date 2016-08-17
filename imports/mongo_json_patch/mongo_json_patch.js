@@ -1,25 +1,30 @@
 import { Mongo } from 'meteor/mongo';
+var jsonpatch = require('fast-json-patch');
 
+// Snippet doing the same job than the usual Object.keys (it's for older browsers)
+// It returns keys from a map
 if(!Object.keys) Object.keys = function(o){
     if (o !== Object(o))
         throw new TypeError('Object.keys called on non-object');
     var ret=[],p;
     for(p in o) if(Object.prototype.hasOwnProperty.call(o,p)) ret.push(p);
     return ret;
-}
+};
 
 const driverJsonPatchMongo = {
     applyPatch: applyPatchFct,
+    compare: compareFct,
+    compareDiff: compareDiffFct,
+    identifyConflictsFromDiffs: identifyConflictsFromDiffsFct
 };
 
 function applyPatchFct(patch, targetCollection) {
     /*** Step 1 : Preprocessing ***/
-    patch = transformPatch(patch);
+    //patch = transformPatch(patch);
 
     /*** Step 2 : update elements ***/
     // Get all keys of the hashmap
     const keys = Object.keys(patch);
-    console.log(keys);
     keys.forEach((key) => {
         let requestset = {};
         patch[key].forEach((patchelem) => {
@@ -31,7 +36,7 @@ function applyPatchFct(patch, targetCollection) {
             } else if (patchelem.op == "remove"){
                 targetCollection.remove( key);
             } else {
-                console.log("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
+                console.error("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
             }
         });
         if (requestset != {}) {
@@ -43,6 +48,51 @@ function applyPatchFct(patch, targetCollection) {
             );
         }
     });
+}
+
+function compareFct(collectionSrc, collectionDst) {
+    var diff = jsonpatch.compare(CollectionToMapByID(collectionSrc), CollectionToMapByID(collectionDst));
+    return transformPatch(diff);
+}
+
+function compareDiffFct(diffSrc, diffDst) {
+    // merge keys from these two diff
+    let keys = arrayUnique(Object.keys(diffSrc).concat(Object.keys(diffDst)));
+
+    let mergedDiff = {};
+    keys.forEach((key) => {
+        // If same, we do not care
+        // else we had it to our new diff of diff
+        if (diffSrc[key] !== diffDst[key]) {
+            mergedDiff[key] = [
+                diffSrc[key],
+                diffDst[key]
+            ]
+        }
+    });
+    return mergedDiff;
+}
+
+function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
+    var diffOfTheseDiffs = compareDiffFct(diffSrc, diffDst);
+    let keys = Object.keys(diffOfTheseDiffs);
+    let conflictedElements = {};
+    keys.forEach((key) => {
+        // if both elements are defined there is a conflict
+        if ((diffOfTheseDiffs[key][1] && diffOfTheseDiffs[key][0])) {
+            conflictedElements[key] = diffOfTheseDiffs[key];
+        }
+    });
+    return conflictedElements;
+}
+
+function CollectionToMapByID(collectionFetched){
+    var dataMapById = {};
+    collectionFetched.forEach((component) => {
+        //delete component._parent;
+        dataMapById[component._id._str] = component;
+    });
+    return dataMapById;
 }
 
 function transformPatch(patch) {
@@ -58,5 +108,18 @@ function transformPatch(patch) {
         patchSortedById[tokens[1]].push(operation);
     });
     return patchSortedById;
+}
+
+// merge two arrays
+function arrayUnique(array) {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] === a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
 }
 export { driverJsonPatchMongo };

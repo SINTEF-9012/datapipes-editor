@@ -22,3 +22,41 @@
     </div>
   </div>
 </template>
+
+<template name="popupConflicts">
+    <div class="modal fade" id="popupNewBranch" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h4>Conflicts resolution</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-6">
+                        <h3 class="page-header">Current Branch</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="page-header">Master Branch</h3>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Element 1</div>
+                            <div class="panel-body">
+                                <p>...</p>
+                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item">Attribute1 = X</li>
+                                <li class="list-group-item">Attribute2 = Y</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Push to master</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" disabled="disabled">Preview</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" disabled="disabled">Continue to Edit</button>
+                    <!--<button type="button" class="btn btn-primary create" disabled="{{notHasName}}">Create</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
