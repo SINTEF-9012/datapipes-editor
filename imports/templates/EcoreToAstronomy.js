@@ -12,11 +12,13 @@ function loadDustTemplate(name) {
 //Load the DUST template
 loadDustTemplate('ClassWithoutInheritance');
 loadDustTemplate('ClassInherited');
+loadDustTemplate('Export');
 
 //Load ecore file (XMI)
 var fileContents = fs.readFileSync(process.cwd().split('.meteor')[0] + 'resources/BigML-metamodel.ecore', 'utf8');
 var resourceSet = Ecore.ResourceSet.create();
 var resource = resourceSet.create({uri: '/resources/BigML-metamodel.ecore'});
+var result= "";
 
 try {
     //Parse the XMI: we have objects now
@@ -31,9 +33,9 @@ try {
 
         //We retrieve the information related to the attributes
         model.attributes = [];
-        var attribute = {};
         if (c.get('eStructuralFeatures').size() > 0) {
             c.get('eStructuralFeatures').map(function (f) {
+                var attribute = {};
                 attribute.attributeName = f.get('name');
                 var eType = f.get('eType').get('name');
                 if (f.isTypeOf('EReference')) {
@@ -47,7 +49,7 @@ try {
                         attribute.type = "Boolean";
                     }
                 }
-
+                model.attributes.push(attribute);
             });
 
             //To select the type of template we are looking for
@@ -60,7 +62,6 @@ try {
             } else {
                 typeTemplate = "ClassWithoutInheritance";
             }
-            model.attributes.push(attribute);
 
             //We fill the template
             DustJS.render(typeTemplate, model, function (err, out) {
@@ -69,12 +70,31 @@ try {
                     process.exit(1);
                 }
                 else {
-                    console.log(out);
+                    result+=out;
                 }
             });
         }
     });
 
+    var elementsToExport = {};
+    elementsToExport.elements=[];
+    ePackage.get('eClassifiers').map(function (c) {
+        var element={};
+        element.name=c.get('name');
+        elementsToExport.elements.push(element);
+    });
+
+    DustJS.render('Export', elementsToExport, function (err, out) {
+        if (err != null) {
+            console.error(err);
+            process.exit(1);
+        }
+        else {
+            result += out;
+        }
+    });
+    console.log(result);
+    eval(result);
 
 } catch (err) {
     console.log('*** Failed parsing metamodel');
