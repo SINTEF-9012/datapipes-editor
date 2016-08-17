@@ -5,6 +5,9 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "dustjs-helpers": "^1.7.3",
+    "dustjs-linkedin": "^2.7.3",
+    "ecore": "^0.7.0",
     "fast-json-patch": "^1.0.0",
     "meteor-node-stubs": "~0.2.0"
   }
