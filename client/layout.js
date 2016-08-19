@@ -20,10 +20,10 @@ Template.leftbar.events({
   'click button.save'(event) {
     Branch.findOne(selectedBranch.get()).commit();
   },
-  'click button.push'(event) {
-    Branch.findOne(selectedBranch.get()).pull();
-    //PopupShow('merge', { some: 'thing' });
-  }
+  'click button.merge'(event) {
+    let conflicts = Branch.findOne(selectedBranch.get()).pull();
+    PopupShow('merge', conflicts);
+  },
 });
 
 Template.leftbar.helpers({

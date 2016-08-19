@@ -75,7 +75,7 @@ var getUserId = function () {
 };
 
 function getRawElements(arrayOfElements) {
-    return arrayOfElements.map(e => { return e.raw()});
+    return arrayOfElements.map((e) => { return e.raw();});
 }
 const Branch = Class.create({
     name: 'branch',
@@ -114,9 +114,21 @@ const Branch = Class.create({
         }
     },
     methods: {
-        merge: function (description, ownerName) {
-            console.error("MERGE NOT IMPLEMENTED YET");
-
+        merge: function () {
+            let masterBranch = Branch.getMasterBranch();
+            if (this.lastPulledVersion._str == masterBranch.lastVersion()._id._str) {
+                console.log("DERNIERE VERSION DEJA PULL");
+                // merge
+                let v = new Version();
+                let branchHead = this.lastVersion();
+                v.elements = branchHead.elements.slice();
+                v.owner = "system";
+                v.changes = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements), getRawElements(v.elements));
+                v.previous = masterBranch.lastVersion()._id;
+                v.mergedFrom = branchHead._id;
+                masterBranch.versions.push(v);
+                masterBranch.save();
+            }
             // STEP 1
             // Pull master
 
@@ -136,20 +148,19 @@ const Branch = Class.create({
 
             if (masterHead._id == this.lastPulledVersion) {
                 console.log("no changes in master");
-                return;
+                return {};
             }
             var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
             var branchChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(branchHead.elements));
             var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(masterHead.elements));
             // STEP 2
-            // Compare these diffs. (kind of diff of the diff)
+            // Compare these diffs. (kind of diff of diffs)
             // Generate a structure with these differences per element
             // return this to the user
             var diffOfTheChanges = driverJsonPatchMongo.identifyConflictsFromDiffs(branchChanges, masterChanges);
-
             if (Object.keys(diffOfTheChanges).length) {
                 // manage conflicts
-
+                return diffOfTheChanges;
                 // STEP 3
                 // generate new diff from user choices
 
@@ -158,22 +169,43 @@ const Branch = Class.create({
             } else {
                 // No conflicts, we can merge
                 let v = new Version();
-                v.elements = branchHead.elements;
+                v.elements = branchHead.elements.slice();
                 // if we got changes non conflicted changes in the master branch we apply them
                 if (Object.keys(masterChanges).length)
-                    driverJsonPatchMongo.applyPatch(masterChanges, v.elements);
+                    driverJsonPatchMongo.applyPatchToArray(masterChanges, v.elements, Branch.getMasterBranch());
                 v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements), getRawElements(v.elements));
+                console.log("Line 177 : compare OK");
                 v.previous = branchHead._id;
                 v.mergedFrom = masterHead._id;
                 this.versions.push(v);
                 this.lastPulledVersion = masterHead._id;
                 this.save();
+                console.log("Line 183 : Save OK")
             }
-        },
-        lastVersion: function () {
-            return this.versions.reduce(function (pre, cur) {
-                return Date.parse(pre.timestamp) > Date.parse(cur.timestamp) ? pre : cur;
-            })
+        }, // TODO On doit récupérer le DIFF non conflictueux et l'appliquer sur nos éléments
+        applyConflictResolution: function (conflictResolutionMap) {
+            var branchHead = this.lastVersion();
+            var masterHead = Branch.getMasterHead();
+            var v = new Version();
+            v.elements = branchHead.elements.slice();
+            var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
+            var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(masterHead.elements));
+
+            driverJsonPatchMongo.applyPatchToArray(masterChanges, v.elements, Branch.getMasterBranch());
+            if (Object.keys(conflictResolutionMap).length) {
+                driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements, Branch.getMasterBranch());
+            }
+
+            console.log(v.elements);
+            this.versions.push(v);
+            getRawElements(v.elements);
+            getRawElements(masterHead.elements);
+            v.changes = driverJsonPatchMongo.compare(getRawElements(masterHead.elements), getRawElements(v.elements));
+            console.log('NEXT');
+            v.previous = branchHead._id;
+            v.mergedFrom = masterHead._id;
+            this.lastPulledVersion = masterHead._id;
+            this.save();
         },
         commit: function () {
             // create new version on same branch
@@ -183,12 +215,7 @@ const Branch = Class.create({
             newVersion.previous = currentVersion._id;
 
             // Search the old version
-            var branchOfTheOldVersion = Branch.findOne({
-                'versions': {
-                    $elemMatch: { '_id': currentVersion.previous }
-                }
-            });
-            console.log(branchOfTheOldVersion);
+
             if (branchOfTheOldVersion == null) return;
             var oldVersion = branchOfTheOldVersion.versions.find(function (version) {
                 return version._id._str == currentVersion.previous._str;
@@ -208,6 +235,11 @@ const Branch = Class.create({
         rollback: function (idBranch) {
             console.log('ROLLBACK NOT IMPLEMENTED YET');
         },
+        lastVersion: function () {
+            return this.versions.reduce(function (pre, cur) {
+                return Date.parse(pre.timestamp) > Date.parse(cur.timestamp) ? pre : cur;
+            })
+        },
         init: function () {
             let version = new Version();
             let masterHead = Branch.getMasterHead();
@@ -221,7 +253,13 @@ const Branch = Class.create({
             return this.versions.find(function (version) {
                 return version._id._str == versionId._str;
             });
+        },
+        getLastElementVersion: function(elementId) {
+            return this.lastVersion().elements.find(function (elem) {
+                return elem._id._str == elementId;
+            });
         }
+
     }
 });
 

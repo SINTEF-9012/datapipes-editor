@@ -1,47 +1,80 @@
-import { Mongo } from 'meteor/mongo';
+import {Mongo} from 'meteor/mongo';
 var jsonpatch = require('fast-json-patch');
 
 // Snippet doing the same job than the usual Object.keys (it's for older browsers)
 // It returns keys from a map
-if(!Object.keys) Object.keys = function(o){
+if (!Object.keys) Object.keys = function (o) {
     if (o !== Object(o))
         throw new TypeError('Object.keys called on non-object');
-    var ret=[],p;
-    for(p in o) if(Object.prototype.hasOwnProperty.call(o,p)) ret.push(p);
+    var ret = [], p;
+    for (p in o) if (Object.prototype.hasOwnProperty.call(o, p)) ret.push(p);
     return ret;
 };
 
 const driverJsonPatchMongo = {
-    applyPatch: applyPatchFct,
+    applyPatchToArray: applyPatchToArrayFct,
+    applyPatchToCollection: applyPatchToCollectionFct,
     compare: compareFct,
     compareDiff: compareDiffFct,
     identifyConflictsFromDiffs: identifyConflictsFromDiffsFct
 };
 
-function applyPatchFct(patch, targetCollection) {
-    /*** Step 1 : Preprocessing ***/
-    //patch = transformPatch(patch);
-
-    /*** Step 2 : update elements ***/
-    // Get all keys of the hashmap
+function applyPatchToElem(value, tokens, elem) {
+    if (tokens.length > 1) {
+        applyPatchToElem(value, tokens.slice(0,1), elem[tokens[0]]);
+    } else {
+        return elem[0] = value;
+    }
+}
+function applyPatchToArrayFct(patch, arrayOfElements, targetCollection) {
     const keys = Object.keys(patch);
     keys.forEach((key) => {
         let requestset = {};
         patch[key].forEach((patchelem) => {
-            if(patchelem.op == "add") {
+            if (patchelem.op == "add") {
+                var elem = targetCollection.getLastElementVersion(key);
+                console.log(elem);
+                delete elem._parent;
+                delete elem.save;
+                arrayOfElements.push(elem);
+            } else if (patchelem.op == "replace") {
+                var tokens = patchelem.path.split(".");
+                var elem = arrayOfElements.find(function (elem) {
+                    return elem._id._str == key;
+                });
+                applyPatchToElem(patchelem.value, tokens, elem);
+            } else if (patchelem.op == "remove") {
+            } else {
+                console.error("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
+            }
+        });
+    })
+}
+
+function applyPatchToCollectionFct(patch, targetCollection) {
+    /*** Step 1 : Preprocessing ***/
+    //patch = transformPatch(patch);
+
+    /*** Step 2 : update elements ***/
+        // Get all keys of the hashmap
+    const keys = Object.keys(patch);
+    keys.forEach((key) => {
+        let requestset = {};
+        patch[key].forEach((patchelem) => {
+            if (patchelem.op == "add") {
                 delete patchelem._id;
-                targetCollection.insert( patchelem.value );
+                targetCollection.insert(patchelem.value);
             } else if (patchelem.op == "replace") {
                 requestset[patchelem.path] = patchelem.value;
-            } else if (patchelem.op == "remove"){
-                targetCollection.remove( key);
+            } else if (patchelem.op == "remove") {
+                targetCollection.remove(key);
             } else {
                 console.error("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
             }
         });
         if (requestset != {}) {
             targetCollection.update(
-                { "_id": key},
+                {"_id": key},
                 {
                     $set: requestset
                 }
@@ -63,7 +96,7 @@ function compareDiffFct(diffSrc, diffDst) {
     keys.forEach((key) => {
         // If same, we do not care
         // else we had it to our new diff of diff
-        if (diffSrc[key] !== diffDst[key]) {
+        if (JSON.stringify(diffSrc[key]) !== JSON.stringify(diffDst[key])) {
             mergedDiff[key] = [
                 diffSrc[key],
                 diffDst[key]
@@ -86,7 +119,7 @@ function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
     return conflictedElements;
 }
 
-function CollectionToMapByID(collectionFetched){
+function CollectionToMapByID(collectionFetched) {
     var dataMapById = {};
     collectionFetched.forEach((component) => {
         //delete component._parent;
@@ -103,7 +136,7 @@ function transformPatch(patch) {
             patchSortedById[tokens[1]] = [];
         operation.path = tokens[2];
         for (var i = 3; i < tokens.length; ++i) {
-            operation.path = operation.path +"." + tokens[i];
+            operation.path = operation.path + "." + tokens[i];
         }
         patchSortedById[tokens[1]].push(operation);
     });
@@ -113,13 +146,14 @@ function transformPatch(patch) {
 // merge two arrays
 function arrayUnique(array) {
     var a = array.concat();
-    for(var i=0; i<a.length; ++i) {
-        for(var j=i+1; j<a.length; ++j) {
-            if(a[i] === a[j])
+    for (var i = 0; i < a.length; ++i) {
+        for (var j = i + 1; j < a.length; ++j) {
+            if (a[i] === a[j])
                 a.splice(j--, 1);
         }
     }
 
     return a;
 }
-export { driverJsonPatchMongo };
+
+export {driverJsonPatchMongo};
