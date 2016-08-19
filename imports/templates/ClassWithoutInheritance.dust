@@ -1,9 +1,13 @@
 const {elementName} = Class.create({
     name: 'bigml.{elementName}',
     fields: {
-        {#attributes}{attributeName}: {
+        {#attributes}{@sep}{attributeName}: {
             type: {type},
             {default}
-        }{/attributes}
+        },{/sep}
+        {@last}{attributeName}: {
+             type: {type},
+             {default}
+        }{/last}{/attributes}
     }
 });
