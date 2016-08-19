@@ -182,7 +182,7 @@ const Branch = Class.create({
                 this.save();
                 console.log("Line 183 : Save OK")
             }
-        }, // TODO On doit récupérer le DIFF non conflictueux et l'appliquer sur nos éléments
+        },
         applyConflictResolution: function (conflictResolutionMap) {
             var branchHead = this.lastVersion();
             var masterHead = Branch.getMasterHead();
