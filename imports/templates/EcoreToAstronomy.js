@@ -1,5 +1,5 @@
 import {Ecore} from 'ecore/dist/ecore.xmi';
-import {Class} from 'meteor/jagi:astronomy';
+
 
 var fs = Npm.require('fs');
 var DustJS = Npm.require("dustjs-helpers");
@@ -22,7 +22,7 @@ loadDustTemplate('Export');
 var fileContents = fs.readFileSync(process.cwd().split('.meteor')[0] + 'resources/BigML-metamodel.ecore', 'utf8');
 var resourceSet = Ecore.ResourceSet.create();
 var resource = resourceSet.create({uri: '/resources/BigML-metamodel.ecore'});
-var result = "";
+var result = "import {Class} from 'meteor/jagi:astronomy';";
 
 try {
     //Parse the XMI: we have objects now
@@ -122,14 +122,25 @@ try {
         }
     });
 
-    fs.writeFile(process.cwd().split('.meteor')[0] + 'imports/components/test.js', result, 'utf8',  function(err) {
-        if (err) {
-            throw (new Meteor.Error(500, 'Failed to save file.', err));
-        } else {
-            console.log('The file saved');
+    //save as a file the generated code, code is only generated when there is no test.js file
+    fs.stat(process.cwd().split('.meteor')[0] + 'imports/components/test.js', function(err, stat) {
+        if(err == null) {
+            console.log('File exists');
             import '/imports/components/test.js';
+        } else if(err.code == 'ENOENT') {
+            // file does not exist
+            fs.writeFile(process.cwd().split('.meteor')[0] + 'imports/components/test.js', result, 'utf8', function (err) {
+                if (err) {
+                    throw (new Meteor.Error(500, 'Failed to save file.', err));
+                } else {
+                    console.log('The file saved');
+                }
+            });
+        } else {
+            console.log('Some other error: ', err.code);
         }
     });
+
 
 } catch (err) {
     console.log('*** Failed parsing metamodel');
