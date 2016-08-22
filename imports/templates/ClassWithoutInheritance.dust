@@ -1,3 +1,4 @@
+
 const {elementName} = Class.create({
     name: 'bigml.{elementName}',
     fields: {

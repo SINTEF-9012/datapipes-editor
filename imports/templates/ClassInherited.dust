@@ -1,4 +1,5 @@
-const {elementName} = {parentClass}.inherit({({
+
+const {elementName} = {parentClass}.inherit({
     name: 'bigml.{elementName}',
     fields: {
         {#attributes}{@sep}{attributeName}: {
