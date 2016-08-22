@@ -32,7 +32,6 @@ function applyPatchToArrayFct(patch, arrayOfElements, targetCollection) {
         let requestset = {};
         patch[key].forEach((patchelem) => {
             if (patchelem.op == "add") {
-                console.log(elem);
                 var elem = targetCollection.getLastElementVersion(key);
                 delete elem._parent;
                 delete elem.save;
@@ -45,9 +44,6 @@ function applyPatchToArrayFct(patch, arrayOfElements, targetCollection) {
                 applyPatchToElem(patchelem.value, tokens, elem);
             } else if (patchelem.op == "remove") {
             } else {
-                console.log("PATCH ELEM ELSE");
-                console.log(patch);
-                console.log(patchelem);
                 console.error("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
             }
         });

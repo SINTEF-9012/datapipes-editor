@@ -48,8 +48,6 @@ Template.popupMerge.events({
   },
   'click .push-button'(event, template) {
 
-    console.log('---------');
-    console.log(template.conflictResultVar.get());
     if (Object.keys(template.conflictResultVar.get()).length) {
       let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
       Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
@@ -62,11 +60,8 @@ Template.popupMerge.events({
     template.conflictResultVar.set({});
   },
   'click .conflict'(event, template) {
-    console.log('click');
     var idElemClicked = $(event.currentTarget).attr('idelement');
     var whichBranch = $(event.currentTarget).attr('branch');
-    console.log('uuuuuuu');
-    console.log(conflictResolutionResult);
     conflictResolutionResult[idElemClicked] = this.get('data').conflicts[idElemClicked][whichBranch];
     template.conflictResultVar.set(conflictResolutionResult);
   }
@@ -74,18 +69,12 @@ Template.popupMerge.events({
 
 Template.popupMerge.helpers({
   conflictResolutionCompleted() {
-    // if (!JSON.stringify(this.get('data').conflicts)) {
-    //   return {}
-    // }
+
     if (this.get('data') && this.get('data').conflicts) {
 
       if (Object.keys(this.get('data').conflicts).length == 0) {
         return {}
       }
-      console.log("NbElement from conflictResultVar");
-      console.log(Object.keys(Template.instance().conflictResultVar.get()).length);
-      console.log(Template.instance().conflictResultVar.get());
-      console.log(Object.keys(this.get('data').conflicts).length);
       if (Object.keys(Template.instance().conflictResultVar.get()).length >= Object.keys(this.get('data').conflicts).length) {
         return {};
       }

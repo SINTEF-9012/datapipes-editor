@@ -119,7 +119,6 @@ const Branch = Class.create({
         merge: function () {
             let masterBranch = Branch.getMasterBranch();
             if (this.lastPulledVersion._str == masterBranch.lastVersion()._id._str) {
-                console.log("DERNIERE VERSION DEJA PULL");
                 // merge
                 let v = new Version();
                 let branchHead = this.lastVersion();
@@ -152,11 +151,8 @@ const Branch = Class.create({
             var branchHead = this.lastVersion();
             var masterHead = Branch.getMasterHead();
 
-            console.log("aaaaaaaaaaaaaaaa");
-            console.log(masterHead._id);
-            console.log(this.lastPulledVersion);
+            // if we already pulled the last version we do not pull again
             if (masterHead._id._str == this.lastPulledVersion._str) {
-                console.log("no changes in master");
                 return {};
             }
             var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
@@ -180,10 +176,8 @@ const Branch = Class.create({
                 let v = new Version();
                 v.elements = branchHead.elements.slice();
                 // if we got changes non conflicted changes in the master branch we apply them
-                console.log(diffOfTheChanges.nonConflicts);
                 if (Object.keys(diffOfTheChanges.nonConflicts).length)
                     driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements, Branch.getMasterBranch());
-                console.log('checkpoint 1');
                 v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements), getRawElements(v.elements));
 
                 v.previous = branchHead._id;
@@ -191,8 +185,6 @@ const Branch = Class.create({
                 this.versions.push(v);
                 this.lastPulledVersion = masterHead._id;
                 this.save();
-                console.log("Save OK")
-                console.log(diffOfTheChanges);
             }
         },
         applyConflictResolution: function (conflictResolutionMap) {
@@ -210,7 +202,6 @@ const Branch = Class.create({
             getRawElements(v.elements);
             getRawElements(masterHead.elements);
             v.changes = driverJsonPatchMongo.compare(getRawElements(masterHead.elements), getRawElements(v.elements));
-            console.log('NEXT');
             v.previous = branchHead._id;
             v.mergedFrom = masterHead._id;
             this.lastPulledVersion = masterHead._id;
