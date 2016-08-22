@@ -4,9 +4,12 @@ import { selectedBranch } from '/client/branch.js';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 Template.popupMerge.onCreated(function() {
-  this.conflictResultVar = new ReactiveVar(new Object());
+  this.conflictResultVar = new ReactiveVar({});
 });
 
+Template.popupMerge.onRendered(function() {
+  this.conflictResultVar.set({});
+});
 var contains = function(needle) {
   // Per spec, the way to identify NaN is that it is not equal to itself
   var findNaN = needle !== needle;
@@ -44,59 +47,81 @@ Template.popupMerge.events({
     template.$('.modal').modal('hide');
   },
   'click .push-button'(event, template) {
-    if (Object.keys(template.conflictResultVar).length) {
-      Branch.findOne(selectedBranch.get()).applyConflictResolution(template.conflictResultVar.get());
+
+    console.log('---------');
+    console.log(template.conflictResultVar.get());
+    if (Object.keys(template.conflictResultVar.get()).length) {
+      let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
+      Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
     }
     template.conflictResultVar.set({});
     Branch.findOne(selectedBranch.get()).merge();
   },
   'click .continue-button'(event) {
-    console.log('continue');
+    // TODO create version, apply patch and do not push to master
     template.conflictResultVar.set({});
   },
   'click .conflict'(event, template) {
     console.log('click');
     var idElemClicked = $(event.currentTarget).attr('idelement');
     var whichBranch = $(event.currentTarget).attr('branch');
-    conflictResolutionResult[idElemClicked] = this.get('data')[idElemClicked][whichBranch];
+    console.log('uuuuuuu');
+    console.log(conflictResolutionResult);
+    conflictResolutionResult[idElemClicked] = this.get('data').conflicts[idElemClicked][whichBranch];
     template.conflictResultVar.set(conflictResolutionResult);
   }
 });
 
 Template.popupMerge.helpers({
   conflictResolutionCompleted() {
-    if (!JSON.stringify(this.get('data'))) {
-      return {}
+    // if (!JSON.stringify(this.get('data').conflicts)) {
+    //   return {}
+    // }
+    if (this.get('data') && this.get('data').conflicts) {
+
+      if (Object.keys(this.get('data').conflicts).length == 0) {
+        return {}
+      }
+      console.log("NbElement from conflictResultVar");
+      console.log(Object.keys(Template.instance().conflictResultVar.get()).length);
+      console.log(Template.instance().conflictResultVar.get());
+      console.log(Object.keys(this.get('data').conflicts).length);
+      if (Object.keys(Template.instance().conflictResultVar.get()).length >= Object.keys(this.get('data').conflicts).length) {
+        return {};
+      }
+      return {disabled:'disabled'};
+    } else {
+      return {disabled: 'disabled'};
     }
-    if (Object.keys(Template.instance().conflictResultVar.get()).length == Object.keys(this.get('data')).length) {
-      return {};
-    }
-    return {disabled:'disabled'};
 
   },
   conflictElementStatus(key, branch) {
-
-    if (Object.keys(Template.instance().conflictResultVar.get()).length == 0) {
-      return 'panel-default';
-    } else if (JSON.stringify(Template.instance().conflictResultVar.get()[key]) == JSON.stringify(this.get('data')[key][branch])) {
-      console.log(Object.keys(Template.instance().conflictResultVar.get()));
-      console.log(Object.keys(this.get('data')));
-      console.log("YEAH");
-      return 'panel-success';
-    } else {
-      return 'panel-danger';
-    }
+    if (this.get('data') && this.get('data').conflicts) {
+      if (Object.keys(Template.instance().conflictResultVar.get()).length == 0) {
+        return 'panel-default';
+      } else if (JSON.stringify(Template.instance().conflictResultVar.get()[key]) == JSON.stringify(this.get('data').conflicts[key][branch])) {
+        return 'panel-success';
+      } else {
+        return 'panel-danger';
+      }
+    } else return '';
   },
   getconflict(key) {
-    return this.get('data')[key];
+    return this.get('data').conflicts[key];
   },
   getOperationType(patch) {
     return patch[0].op;
   },
   keys() {
-    return Object.keys(this.get('data'));
+    if (this.get('data') && this.get('data').conflicts)
+      return Object.keys(this.get('data').conflicts);
+    else
+      return [];
   },
   data() {
-    return JSON.stringify(this.get('data'));
+    if (this.get('data') && this.get('data').conflicts)
+      return JSON.stringify(this.get('data').conflicts);
+    else
+      return '';
   }
 });

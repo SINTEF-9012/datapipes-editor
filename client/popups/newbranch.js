@@ -2,6 +2,7 @@ import { Template } from 'meteor/templating';
 
 import { Branch, Version } from '/imports/synchronization/version.js';
 import { selectedBranch } from '/client/branch.js';
+import { Notification } from '/imports/notifications/notifications.js';
 
 Template.popupNewBranch.events({
   'shown.bs.modal .modal'(event,template) {
@@ -18,7 +19,12 @@ Template.popupNewBranch.events({
     
     // Close dialog
     this.set('name','');
+    var notif = new Notification();
+    notif.status = 3;
+    notif.description = "Branch created";
+    notif.save();
     template.$('.modal').modal('hide');
+
   }
 });
 

@@ -75,7 +75,9 @@ var getUserId = function () {
 };
 
 function getRawElements(arrayOfElements) {
-    return arrayOfElements.map((e) => { return e.raw();});
+    return arrayOfElements.map((e) => {
+        return e.raw();
+    });
 }
 const Branch = Class.create({
     name: 'branch',
@@ -128,6 +130,8 @@ const Branch = Class.create({
                 v.mergedFrom = branchHead._id;
                 masterBranch.versions.push(v);
                 masterBranch.save();
+                this.lastPulledVersion = Branch.getMasterHead()._id;
+                this.save();
             } else {
                 this.pull();
             }
@@ -148,7 +152,10 @@ const Branch = Class.create({
             var branchHead = this.lastVersion();
             var masterHead = Branch.getMasterHead();
 
-            if (masterHead._id == this.lastPulledVersion) {
+            console.log("aaaaaaaaaaaaaaaa");
+            console.log(masterHead._id);
+            console.log(this.lastPulledVersion);
+            if (masterHead._id._str == this.lastPulledVersion._str) {
                 console.log("no changes in master");
                 return {};
             }
@@ -157,10 +164,10 @@ const Branch = Class.create({
             var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(masterHead.elements));
             // STEP 2
             // Compare these diffs. (kind of diff of diffs)
-            // Generate a structure with these differences per element
-            // return this to the user
+            // Generate a structure which contains in .conflicts conflicts ([ [patchs1], [patchs2] ] and in nonconflicts diff which is ok
+            // return this structure to the user if it contains conflicts
             var diffOfTheChanges = driverJsonPatchMongo.identifyConflictsFromDiffs(branchChanges, masterChanges);
-            if (Object.keys(diffOfTheChanges).length) {
+            if (Object.keys(diffOfTheChanges.conflicts).length) {
                 // manage conflicts
                 return diffOfTheChanges;
                 // STEP 3
@@ -173,32 +180,32 @@ const Branch = Class.create({
                 let v = new Version();
                 v.elements = branchHead.elements.slice();
                 // if we got changes non conflicted changes in the master branch we apply them
-                if (Object.keys(masterChanges).length)
-                    driverJsonPatchMongo.applyPatchToArray(masterChanges, v.elements, Branch.getMasterBranch());
+                console.log(diffOfTheChanges.nonConflicts);
+                if (Object.keys(diffOfTheChanges.nonConflicts).length)
+                    driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements, Branch.getMasterBranch());
+                console.log('checkpoint 1');
                 v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements), getRawElements(v.elements));
-                console.log("Line 177 : compare OK");
+
                 v.previous = branchHead._id;
                 v.mergedFrom = masterHead._id;
                 this.versions.push(v);
                 this.lastPulledVersion = masterHead._id;
                 this.save();
-                console.log("Line 183 : Save OK")
+                console.log("Save OK")
+                console.log(diffOfTheChanges);
             }
         },
         applyConflictResolution: function (conflictResolutionMap) {
             var branchHead = this.lastVersion();
             var masterHead = Branch.getMasterHead();
             var v = new Version();
-            v.elements = branchHead.elements.slice();
-            var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
-            var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(masterHead.elements));
-
-            driverJsonPatchMongo.applyPatchToArray(masterChanges, v.elements, Branch.getMasterBranch());
+            //v.elements = branchHead.elements.slice();
+            v.elements = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements.slice();
+            //var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements;
             if (Object.keys(conflictResolutionMap).length) {
                 driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements, Branch.getMasterBranch());
             }
 
-            console.log(v.elements);
             this.versions.push(v);
             getRawElements(v.elements);
             getRawElements(masterHead.elements);
@@ -217,7 +224,11 @@ const Branch = Class.create({
             newVersion.previous = currentVersion._id;
 
             // Search the old version
-
+            var branchOfTheOldVersion = Branch.findOne({
+                versions: {
+                    $elemMatch: { '_id': currentVersion.previous}
+                }
+            });
             if (branchOfTheOldVersion == null) return;
             var oldVersion = branchOfTheOldVersion.versions.find(function (version) {
                 return version._id._str == currentVersion.previous._str;
