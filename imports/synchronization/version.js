@@ -128,6 +128,8 @@ const Branch = Class.create({
                 v.mergedFrom = branchHead._id;
                 masterBranch.versions.push(v);
                 masterBranch.save();
+            } else {
+                this.pull();
             }
             // STEP 1
             // Pull master
