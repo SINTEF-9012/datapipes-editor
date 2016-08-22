@@ -33,6 +33,7 @@ Meteor.setInterval(function() {
 
 Template.notificationContainer.helpers({
     notifications() {
+        // We listen to master in order to know when a new version is available
         var query = Branch.find({_id: "master"});
         query.observeChanges({
             added: function(id, fields) {
@@ -45,7 +46,9 @@ Template.notificationContainer.helpers({
                 notif.status = 0;
                 notif.save();
             }
-        })
+        });
+
+        // return our notifications sorted by date
         return Notification.find({},{ sort: { createdAt: -1 } });
     }
 });
