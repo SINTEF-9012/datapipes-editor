@@ -121,8 +121,15 @@ try {
             result += out;
         }
     });
-    console.log(result);
 
+    fs.writeFile(process.cwd().split('.meteor')[0] + 'imports/components/test.js', result, 'utf8',  function(err) {
+        if (err) {
+            throw (new Meteor.Error(500, 'Failed to save file.', err));
+        } else {
+            console.log('The file saved');
+            import '/imports/components/test.js';
+        }
+    });
 
 } catch (err) {
     console.log('*** Failed parsing metamodel');
