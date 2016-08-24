@@ -83,4 +83,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="ControlFlowComponent" eSuperTypes="#//ManagedComponent">
     <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ControlFlowComponentType"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CompositeComponent" eSuperTypes="#//Component">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components" upperBound="-1"
+        eType="#//Component"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ComponentType"/>
+  </eClassifiers>
 </ecore:EPackage>
