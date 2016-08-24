@@ -20,7 +20,7 @@ Template.leftbar.events({
   'click button.save'(event) {
     Branch.findOne(selectedBranch.get()).commit();
   },
-  'click button.merge'(event) {
+  'click .merge'(event) {
     let conflicts = Branch.findOne(selectedBranch.get()).pull();
     PopupShow('merge', conflicts);
   },

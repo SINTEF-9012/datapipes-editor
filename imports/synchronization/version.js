@@ -100,6 +100,10 @@ const Branch = Class.create({
                 return [];
             }
         },
+        closed: {
+            type: Boolean,
+            default: false
+        },
         lastPulledVersion: {
             type: Mongo.ObjectID,
             optional: true
@@ -127,9 +131,11 @@ const Branch = Class.create({
                 v.changes = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements), getRawElements(v.elements));
                 v.previous = masterBranch.lastVersion()._id;
                 v.mergedFrom = branchHead._id;
+
                 masterBranch.versions.push(v);
                 masterBranch.save();
                 this.lastPulledVersion = Branch.getMasterHead()._id;
+                this.closed = true;
                 this.save();
             } else {
                 this.pull();
@@ -153,6 +159,7 @@ const Branch = Class.create({
 
             // if we already pulled the last version we do not pull again
             if (masterHead._id._str == this.lastPulledVersion._str) {
+                console.log('Last pulled version is already the master head, Not pulled again');
                 return {};
             }
             var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
@@ -174,10 +181,12 @@ const Branch = Class.create({
             } else {
                 // No conflicts, we can merge
                 let v = new Version();
-                v.elements = branchHead.elements.slice();
+                //v.elements = branchHead.elements.slice();
+
+                v.elements = pulledVersion.elements.slice();
                 // if we got changes non conflicted changes in the master branch we apply them
                 if (Object.keys(diffOfTheChanges.nonConflicts).length)
-                    driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements, Branch.getMasterBranch());
+                    driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements, Branch.getMasterBranch(), branchHead.elements.slice());
                 v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements), getRawElements(v.elements));
 
                 v.previous = branchHead._id;
@@ -195,7 +204,8 @@ const Branch = Class.create({
             v.elements = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements.slice();
             //var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements;
             if (Object.keys(conflictResolutionMap).length) {
-                driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements, Branch.getMasterBranch());
+                console.log(branchHead.elements.slice());
+                driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements, Branch.getMasterBranch(), branchHead.elements.slice());
             }
 
             this.versions.push(v);
@@ -281,7 +291,7 @@ function getUserBranchFct() {
     }catch (e) {
         return;
     }
-    return Branch.find({$or: [ {'owner': currentUser}, {'_id': 'master'}]});
+    return Branch.find({$or: [ {'owner': currentUser, 'closed': false}, {'_id': 'master'}]});
 }
 
 function createNewBranchFct() {

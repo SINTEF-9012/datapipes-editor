@@ -26,13 +26,18 @@ function applyPatchToElem(value, tokens, elem) {
         return elem[0] = value;
     }
 }
-function applyPatchToArrayFct(patch, arrayOfElements, targetCollection) {
+function applyPatchToArrayFct(patch, arrayOfElements, targetCollection, branchElements) {
     const keys = Object.keys(patch);
     keys.forEach((key) => {
         let requestset = {};
         patch[key].forEach((patchelem) => {
             if (patchelem.op == "add") {
                 var elem = targetCollection.getLastElementVersion(key);
+                if (!elem) {
+                    elem = branchElements.find(function (elem) {
+                        return elem._id._str == key;
+                    });
+                }
                 delete elem._parent;
                 delete elem.save;
                 arrayOfElements.push(elem);
@@ -110,21 +115,28 @@ function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
     let sortedDiff = {};
     sortedDiff.conflicts = {};
     sortedDiff.nonConflicts = {};
+    var debug1 = 0;
+    var debug2 = 0;
     keys.forEach((key) => {
         // If same, we do not care
         // else we had it to our new diff of diff
         if (typeof diffSrc[key] !== 'undefined' && typeof diffDst[key] !== 'undefined') {
-            if (JSON.stringify(diffSrc[key]) !== JSON.stringify(diffDst[key]) && (diffSrc[key][0].op != "add" && diffDst[key][0].op != "add")) {
+            if ((JSON.stringify(diffSrc[key]) !== JSON.stringify(diffDst[key])) &&
+                (diffSrc[key][0].op != "add" && diffDst[key][0].op != "add")) {
                 if (diffSrc[key] && diffDst[key]) {
                     sortedDiff.conflicts[key] = [diffSrc[key], diffDst[key]];
                 }
             }
-        } else if (typeof diffDst[key] !== 'undefined') {
+        } else if (diffDst[key]) {
+            debug1++;
             sortedDiff.nonConflicts[key] = diffDst[key];
-        } else if (typeof diffSrc[key] !== 'undefined') {
+        } else if (diffSrc[key]) {
+            debug2++;
             sortedDiff.nonConflicts[key] = diffSrc[key];
         }
     });
+    console.log(""+ debug1 + " élements ajoutés à la master");
+    console.log(""+ debug2 + " élements ajoutés à branche");
     return sortedDiff;
     /*var diffOfTheseDiffs = compareDiffFct(diffSrc, diffDst);
     let keys = Object.keys(diffOfTheseDiffs);

@@ -1,6 +1,9 @@
 import { Template } from 'meteor/templating';
 import { Notification, Status } from '/imports/notifications/notifications.js';
 import { Branch } from '/imports/synchronization/version.js';
+import { selectedBranch } from '/client/branch.js';
+import { PopupShow } from '/client/popups/popups.js';
+
 Template.notification.events({
     'click .close-button'(event) {
         console.log("close");
@@ -10,7 +13,12 @@ Template.notification.events({
         notif.read = true;
         notif.save();
         $("#"+id).fadeOut();
-    }
+    },
+    'click .merge'(event) {
+        let conflicts = Branch.findOne(selectedBranch.get()).pull();
+        PopupShow('merge', conflicts);
+    },
+
 });
 Template.notification.helpers({
     timelapse() {

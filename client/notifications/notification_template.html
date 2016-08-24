@@ -1,7 +1,7 @@
 <template name="notification">
     <div class="notification-panel notif-{{status}}" id="{{_id}}">
         <div class="header row">
-            {{#if isActionType}}<i class="fa fa-check left-icon col-md-2"></i>{{else}}{{/if}}
+            {{#if isActionType}}<i class="fa fa-check merge col-md-2"></i>{{else}}{{/if}}
             <p class="{{#if isActionType}} {{else}} col-md-offset-2 {{/if}}col-md-8">{{status}}</p>
             <i class="fa fa-times close-button col-md-2"></i>
         </div>

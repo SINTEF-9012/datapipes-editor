@@ -52,12 +52,20 @@ Template.popupMerge.events({
       let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
       Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
     }
+    conflictResolutionResult = {};
     template.conflictResultVar.set({});
+    console.log("Merge");
     Branch.findOne(selectedBranch.get()).merge();
+    selectedBranch.set(undefined);
   },
-  'click .continue-button'(event) {
+  'click .continue-button'(event, template) {
     // TODO create version, apply patch and do not push to master
+    if (Object.keys(template.conflictResultVar.get()).length) {
+      let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
+      Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
+    }
     template.conflictResultVar.set({});
+    conflictResolutionResult = {};
   },
   'click .conflict'(event, template) {
     var idElemClicked = $(event.currentTarget).attr('idelement');
@@ -80,7 +88,7 @@ Template.popupMerge.helpers({
       }
       return {disabled:'disabled'};
     } else {
-      return {disabled: 'disabled'};
+      return {};
     }
 
   },
