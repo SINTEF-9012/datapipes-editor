@@ -33,7 +33,6 @@ function applyPatchToArrayFct(patch, arrayOfElements, targetCollection) {
         patch[key].forEach((patchelem) => {
             if (patchelem.op == "add") {
                 var elem = targetCollection.getLastElementVersion(key);
-                console.log(elem);
                 delete elem._parent;
                 delete elem.save;
                 arrayOfElements.push(elem);
@@ -107,16 +106,40 @@ function compareDiffFct(diffSrc, diffDst) {
 }
 
 function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
-    var diffOfTheseDiffs = compareDiffFct(diffSrc, diffDst);
+    let keys = arrayUnique(Object.keys(diffSrc).concat(Object.keys(diffDst)));
+    let sortedDiff = {};
+    sortedDiff.conflicts = {};
+    sortedDiff.nonConflicts = {};
+    keys.forEach((key) => {
+        // If same, we do not care
+        // else we had it to our new diff of diff
+        if (typeof diffSrc[key] !== 'undefined' && typeof diffDst[key] !== 'undefined') {
+            if (JSON.stringify(diffSrc[key]) !== JSON.stringify(diffDst[key]) && (diffSrc[key][0].op != "add" && diffDst[key][0].op != "add")) {
+                if (diffSrc[key] && diffDst[key]) {
+                    sortedDiff.conflicts[key] = [diffSrc[key], diffDst[key]];
+                }
+            }
+        } else if (typeof diffDst[key] !== 'undefined') {
+            sortedDiff.nonConflicts[key] = diffDst[key];
+        } else if (typeof diffSrc[key] !== 'undefined') {
+            sortedDiff.nonConflicts[key] = diffSrc[key];
+        }
+    });
+    return sortedDiff;
+    /*var diffOfTheseDiffs = compareDiffFct(diffSrc, diffDst);
     let keys = Object.keys(diffOfTheseDiffs);
-    let conflictedElements = {};
+    let sortedDiff = {};
+    sortedDiff.conflicts = {};
+    sortedDiff.nonConflicts = {}
     keys.forEach((key) => {
         // if both elements are defined there is a conflict
         if ((diffOfTheseDiffs[key][1] && diffOfTheseDiffs[key][0])) {
-            conflictedElements[key] = diffOfTheseDiffs[key];
+            sortedDiff.conflicts[key] = diffOfTheseDiffs[key];
+        } else if (diffOfTheseDiffs[{
+            sortedDiff.nonConflicts[key] =
         }
     });
-    return conflictedElements;
+    return conflictedElements;*/
 }
 
 function CollectionToMapByID(collectionFetched) {
