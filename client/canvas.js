@@ -1,7 +1,9 @@
 import { Template } from 'meteor/templating';
 import { Class, Type } from 'meteor/jagi:astronomy';
 
-import { Branch, Version } from '/imports/synchronization/version.js';
+import { Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js'
+
 import { ComponentsList } from '/imports/components/list.js';
 import { BigmlComponent, BigmlCompositeComponent, BigmlDatamodel } from '/imports/components/basic.js';
 

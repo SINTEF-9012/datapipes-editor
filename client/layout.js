@@ -1,7 +1,8 @@
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Blaze } from 'meteor/blaze';
 
-import { Branch, Version } from '/imports/synchronization/version.js';
+import { Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js'
 import { selectedBranch } from '/client/branch.js';
 
 import { PopupShow } from '/client/popups/popups.js';

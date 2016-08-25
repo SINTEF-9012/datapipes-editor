@@ -1,6 +1,7 @@
 import { Template } from 'meteor/templating';
 
-import { Branch, Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js';
+
 import { selectedBranch } from '/client/branch.js';
 import { Notification } from '/imports/notifications/notifications.js';
 

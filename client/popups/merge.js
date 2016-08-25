@@ -1,5 +1,7 @@
 import { Template } from 'meteor/templating';
-import { Branch, Version } from '/imports/synchronization/version.js';
+import { Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js';
+
 import { selectedBranch } from '/client/branch.js';
 import { ReactiveVar } from 'meteor/reactive-var';
 

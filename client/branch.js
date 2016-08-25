@@ -2,7 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
-import { Branch, Version } from '/imports/synchronization/version.js';
+import { Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js'
 
 const selectedBranch = new ReactiveVar(undefined);
 

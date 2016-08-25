@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { Branch, Version } from '/imports/synchronization/version.js';
-import { BigmlComponent, BigmlDatamodel } from '/imports/components/basic.js';
+import { Version } from '/imports/synchronization/version.js';
+import { Branch } from '/imports/synchronization/branch.js'
+
 Meteor.startup(() => {
   var master = Branch.findOne('master');
   
