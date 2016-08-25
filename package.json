@@ -5,6 +5,7 @@
     "start": "meteor run"
   },
   "dependencies": {
+    "dateformat": "^1.0.12",
     "dustjs-helpers": "^1.7.3",
     "dustjs-linkedin": "^2.7.3",
     "ecore": "^0.7.0",

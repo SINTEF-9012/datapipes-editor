@@ -7,6 +7,7 @@ import { selectedBranch } from '/client/branch.js';
 
 import { PopupShow } from '/client/popups/popups.js';
 
+var dateFormat = require('dateformat');
 Template.leftbar.events({
   'click ul.nav>li>a'(event) {
     event.preventDefault();
@@ -25,6 +26,10 @@ Template.leftbar.events({
     let conflicts = Branch.findOne(selectedBranch.get()).pull();
     PopupShow('merge', conflicts);
   },
+  'click .rollback'(event) {
+    var idVersionClicked = $(event.currentTarget).attr('idversion');
+    selectedBranch.get() ? selectedBranch.get().rollback(idVersionClicked) : Branch.getMasterBranch().rollback(idVersionClicked);
+  }
 });
 
 Template.leftbar.helpers({
@@ -39,6 +44,12 @@ Template.leftbar.helpers({
       return branch._id == 'master';
     else
       return selectedBranch.get() == branch._id;
+  },
+  versions() {
+      return selectedBranch.get() ? selectedBranch.get().versions : Branch.getMasterBranch().versions
+  },
+  formatDate(timestamp) {
+    return dateFormat(timestamp, "isoDateTime");
   }
 });
 

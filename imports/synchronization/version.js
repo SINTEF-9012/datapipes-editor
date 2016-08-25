@@ -19,7 +19,6 @@ const Version = Class.create({
         },
         timestamp: {
             type: Date,
-            immutable: true,
             default() {
                 return new Date();
             }
