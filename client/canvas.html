@@ -1,5 +1,5 @@
 <template name="canvasElements">
-  {{#each component in elements}}
+  {{#each component in getElements}}
     {{#with component}}
       {{> Template.dynamic template=getBigmlComponentTemplate }}
     {{/with}}

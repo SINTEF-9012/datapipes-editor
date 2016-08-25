@@ -191,12 +191,20 @@ const BigmlDatamodel = BigmlElement.inherit({
   name: 'bigml.datamodel',
   fields: {
     components: {
-      type: [Mongo.ObjectID],
+      type: [BigmlComponent],
       default() { return []; }
     },
     pipelines: {
-      type: [Mongo.ObjectID],
+      type: [BigmlPipeline],
       default() { return []; }
+    }
+  },
+  methods: {
+    getElements: function() {
+      return this.components;
+    },
+    addElement: function(obj) {
+      this.components.push(obj);
     }
   }
 });

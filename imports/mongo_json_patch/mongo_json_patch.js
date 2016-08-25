@@ -11,6 +11,17 @@ if (!Object.keys) Object.keys = function (o) {
     return ret;
 };
 
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
 const driverJsonPatchMongo = {
     applyPatchToArray: applyPatchToArrayFct,
     applyPatchToCollection: applyPatchToCollectionFct,
@@ -48,6 +59,9 @@ function applyPatchToArrayFct(patch, arrayOfElements, targetCollection, branchEl
                 });
                 applyPatchToElem(patchelem.value, tokens, elem);
             } else if (patchelem.op == "remove") {
+                arrayOfElements.remove(arrayOfElements.find(function (elem) {
+                    return elem._id._str == key;
+                }))
             } else {
                 console.error("ELSE NOT IMPLEMENTED, SEE mongo_json_patch.js");
             }
@@ -135,23 +149,7 @@ function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
             sortedDiff.nonConflicts[key] = diffSrc[key];
         }
     });
-    console.log(""+ debug1 + " élements ajoutés à la master");
-    console.log(""+ debug2 + " élements ajoutés à branche");
     return sortedDiff;
-    /*var diffOfTheseDiffs = compareDiffFct(diffSrc, diffDst);
-    let keys = Object.keys(diffOfTheseDiffs);
-    let sortedDiff = {};
-    sortedDiff.conflicts = {};
-    sortedDiff.nonConflicts = {}
-    keys.forEach((key) => {
-        // if both elements are defined there is a conflict
-        if ((diffOfTheseDiffs[key][1] && diffOfTheseDiffs[key][0])) {
-            sortedDiff.conflicts[key] = diffOfTheseDiffs[key];
-        } else if (diffOfTheseDiffs[{
-            sortedDiff.nonConflicts[key] =
-        }
-    });
-    return conflictedElements;*/
 }
 
 function CollectionToMapByID(collectionFetched) {

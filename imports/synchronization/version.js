@@ -3,7 +3,7 @@ import {Mongo} from 'meteor/mongo';
 import {Class, Type, Validator} from 'meteor/jagi:astronomy';
 
 import { driverJsonPatchMongo } from '/imports/mongo_json_patch/mongo_json_patch';
-import {BigmlElement} from '/imports/components/basic.js';
+import {BigmlElement, BigmlDatamodel} from '/imports/components/basic.js';
 
 const Branches = new Mongo.Collection('branches');
 
@@ -42,9 +42,9 @@ const Version = Class.create({
             }
         },
         elements: {
-            type: [BigmlElement],
+            type: BigmlDatamodel,
             default() {
-                return [];
+                return new BigmlDatamodel;
             }
         }
     },
@@ -58,7 +58,7 @@ const Version = Class.create({
                     console.error('save(): No parent branch set!');
                 this._parentBranch.save();
             };
-            e.target.elements.forEach(el => {
+            e.target.elements.getElements().forEach(el => {
                 el._parent = e.target;
             });
         }
@@ -126,9 +126,9 @@ const Branch = Class.create({
                 // merge
                 let v = new Version();
                 let branchHead = this.lastVersion();
-                v.elements = branchHead.elements.slice();
+                v.elements.components = branchHead.elements.getElements().slice();
                 v.owner = "system";
-                v.changes = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements), getRawElements(v.elements));
+                v.changes = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements.getElements()), getRawElements(v.elements.getElements()));
                 v.previous = masterBranch.lastVersion()._id;
                 v.mergedFrom = branchHead._id;
 
@@ -163,8 +163,8 @@ const Branch = Class.create({
                 return {};
             }
             var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
-            var branchChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(branchHead.elements));
-            var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements), getRawElements(masterHead.elements));
+            var branchChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.getElements()), getRawElements(branchHead.elements.getElements()));
+            var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.getElements()), getRawElements(masterHead.elements.getElements()));
             // STEP 2
             // Compare these diffs. (kind of diff of diffs)
             // Generate a structure which contains in .conflicts conflicts ([ [patchs1], [patchs2] ] and in nonconflicts diff which is ok
@@ -181,13 +181,11 @@ const Branch = Class.create({
             } else {
                 // No conflicts, we can merge
                 let v = new Version();
-                //v.elements = branchHead.elements.slice();
-
-                v.elements = pulledVersion.elements.slice();
+                v.elements.components = pulledVersion.elements.getElements().slice();
                 // if we got changes non conflicted changes in the master branch we apply them
                 if (Object.keys(diffOfTheChanges.nonConflicts).length)
-                    driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements, Branch.getMasterBranch(), branchHead.elements.slice());
-                v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements), getRawElements(v.elements));
+                    driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements.getElements(), Branch.getMasterBranch(), branchHead.elements.getElements().slice());
+                v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements.getElements()), getRawElements(v.elements.getElements()));
 
                 v.previous = branchHead._id;
                 v.mergedFrom = masterHead._id;
@@ -200,18 +198,13 @@ const Branch = Class.create({
             var branchHead = this.lastVersion();
             var masterHead = Branch.getMasterHead();
             var v = new Version();
-            //v.elements = branchHead.elements.slice();
-            v.elements = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements.slice();
-            //var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements;
+            v.elements.components = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements.getElements().slice();
             if (Object.keys(conflictResolutionMap).length) {
-                console.log(branchHead.elements.slice());
-                driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements, Branch.getMasterBranch(), branchHead.elements.slice());
+                driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements.getElements(), Branch.getMasterBranch(), branchHead.elements.getElements().slice());
             }
 
             this.versions.push(v);
-            getRawElements(v.elements);
-            getRawElements(masterHead.elements);
-            v.changes = driverJsonPatchMongo.compare(getRawElements(masterHead.elements), getRawElements(v.elements));
+            v.changes = driverJsonPatchMongo.compare(getRawElements(masterHead.elements.getElements()), getRawElements(v.elements.getElements()));
             v.previous = branchHead._id;
             v.mergedFrom = masterHead._id;
             this.lastPulledVersion = masterHead._id;
@@ -221,7 +214,7 @@ const Branch = Class.create({
             // create new version on same branch
             var newVersion = new Version();
             var currentVersion = this.lastVersion();
-            newVersion.elements = currentVersion.elements;
+            newVersion.elements.components = currentVersion.elements.getElements();
             newVersion.previous = currentVersion._id;
 
             // Search the old version
@@ -230,14 +223,13 @@ const Branch = Class.create({
                     $elemMatch: { '_id': currentVersion.previous}
                 }
             });
-            if (branchOfTheOldVersion == null) return;
+            // if (branchOfTheOldVersion == null) return;
             var oldVersion = branchOfTheOldVersion.versions.find(function (version) {
                 return version._id._str == currentVersion.previous._str;
             });
 
             // Compute diff of the Old version, with our current and store it in the currentVersion array of changes
-            currentVersion.changes = driverJsonPatchMongo.compare(getRawElements(oldVersion.elements), getRawElements(currentVersion.elements));
-
+            currentVersion.changes = driverJsonPatchMongo.compare(getRawElements(oldVersion.elements.getElements()), getRawElements(currentVersion.elements.getElements()));
             // Push the new Version (so it becomes our current now)
             this.versions.push(newVersion);
 
@@ -246,8 +238,10 @@ const Branch = Class.create({
 
             return newVersion;
         },
-        rollback: function (idBranch) {
-            console.log('ROLLBACK NOT IMPLEMENTED YET');
+        rollback: function (idVersion) {
+            console.error('ROLLBACK NOT IMPLEMENTED YET');
+            // TODO It'll be almost like a commit. You commit an old version (you copy an old version).
+            // So the date will be updated and the "last version" will be this one
         },
         lastVersion: function () {
             return this.versions.reduce(function (pre, cur) {
@@ -257,7 +251,7 @@ const Branch = Class.create({
         init: function () {
             let version = new Version();
             let masterHead = Branch.getMasterHead();
-            version.elements = masterHead.elements;
+            version.elements.components = masterHead.elements.getElements();
             version.previous = masterHead._id;
             this.versions.push(version);
             this.lastPulledVersion = masterHead._id;
@@ -269,7 +263,7 @@ const Branch = Class.create({
             });
         },
         getLastElementVersion: function(elementId) {
-            return this.lastVersion().elements.find(function (elem) {
+            return this.lastVersion().elements.getElements().find(function (elem) {
                 return elem._id._str == elementId;
             });
         }

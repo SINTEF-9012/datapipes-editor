@@ -24,7 +24,9 @@ Template.rightbar.helpers({
 });
 
 Template.formField.helpers({
+
   text(element, field) {
+
     return element[field.name];
   }
 });

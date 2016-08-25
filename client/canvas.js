@@ -3,7 +3,7 @@ import { Class, Type } from 'meteor/jagi:astronomy';
 
 import { Branch, Version } from '/imports/synchronization/version.js';
 import { ComponentsList } from '/imports/components/list.js';
-import { BigmlComponent, BigmlCompositeComponent } from '/imports/components/basic.js';
+import { BigmlComponent, BigmlCompositeComponent, BigmlDatamodel } from '/imports/components/basic.js';
 
 import { propertiesElement } from '/client/rightbar.js';
 import { attachMouseMove } from '/client/utils.js';
@@ -26,6 +26,12 @@ Template.registerHelper('getBigmlComponentTemplate', function() {
     return undefined;
 });
 
+Template.canvasElements.helpers({
+  getElements: function() {
+    if (this.elements)
+      return this.elements.getElements()
+  }
+});
 Template.editorcanvas.events({
   /* --- Drag-drop new elements onto canvas --- */
   'dragover'(event) {
@@ -45,7 +51,7 @@ Template.editorcanvas.events({
           obj.location.y = event.originalEvent.offsetY;
           // Add component to current version/composite
           if (this instanceof Version)
-            this.elements.push(obj);
+            this.elements.addElement(obj);
           else if (this instanceof BigmlCompositeComponent)
             this.children.push(obj);
           this.save();
@@ -85,7 +91,7 @@ Template.editorcanvas.events({
     if (parent instanceof Version || parent instanceof BigmlCompositeComponent) {
       var list;
       if (parent instanceof Version)
-        list = parent.elements;
+        list = parent.elements.getElements();
       else if (parent instanceof BigmlCompositeComponent)
         list = parent.children;
       
