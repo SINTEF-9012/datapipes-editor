@@ -61,7 +61,6 @@ Template.popupMerge.events({
     selectedBranch.set(undefined);
   },
   'click .continue-button'(event, template) {
-    // TODO create version, apply patch and do not push to master
     if (Object.keys(template.conflictResultVar.get()).length) {
       let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
       Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);

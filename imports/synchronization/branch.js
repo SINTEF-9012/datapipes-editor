@@ -143,13 +143,8 @@ function pullFct() {
     // return this structure to the user if it contains conflicts
     var diffOfTheChanges = driverJsonPatchMongo.identifyConflictsFromDiffs(branchChanges, masterChanges);
     if (Object.keys(diffOfTheChanges.conflicts).length) {
-        // manage conflicts
+        // Send conflicts to the user
         return diffOfTheChanges;
-        // STEP 3
-        // generate new diff from user choices
-
-        // STEP 4
-        // Apply this new diff to our current version
     } else {
         // No conflicts, we can merge
         let v = new Version();
@@ -166,11 +161,17 @@ function pullFct() {
         this.save();
     }
 }
+/**
+ * Fonction called when the user has resolved every conflicts
+ *
+ * @param conflictResolutionMap - array of changes (merge between conflictResolution and nonConflicts in user side)
+ */
 function applyConflictResolutionFct(conflictResolutionMap) {
     var branchHead = this.lastVersion();
     var masterHead = Branch.getMasterHead();
     var v = new Version();
     v.elements.components = Branch.getMasterBranch().getVersion(this.lastPulledVersion).elements.getElements().slice();
+    // Apply the conflict resolution
     if (Object.keys(conflictResolutionMap).length) {
         driverJsonPatchMongo.applyPatchToArray(conflictResolutionMap, v.elements.getElements(), Branch.getMasterBranch(), branchHead.elements.getElements().slice());
     }
@@ -182,6 +183,12 @@ function applyConflictResolutionFct(conflictResolutionMap) {
     this.lastPulledVersion = masterHead._id;
     this.save();
 }
+
+/**
+ * Create a new version in the branch, the array of element is the same than the previous one
+ * Store the diff between the old and the current in the old version.
+ * @returns newVersion
+ */
 function commitFct() {
     // create new version on same branch
     var newVersion = new Version();
@@ -221,11 +228,19 @@ function rollbackFct(idVersion) {
     // TODO It'll be almost like a commit. You commit an old version (you copy an old version).
     // So the date will be updated and the "last version" will be this one
 }
+
+/**
+ * @returns return the last version on the branch
+ */
 function lastVersionFct() {
     return this.versions.reduce(function (pre, cur) {
         return Date.parse(pre.timestamp) > Date.parse(cur.timestamp) ? pre : cur;
     })
 }
+
+/**
+ * Init the branch
+ */
 function initFct() {
     let version = new Version();
     let masterHead = Branch.getMasterHead();
@@ -235,11 +250,24 @@ function initFct() {
     this.lastPulledVersion = masterHead._id;
     this.save();
 }
+
+/**
+ *
+ * @param versionId
+ * @returns return the version in the branch associated to the param if it exists (else return undefined)
+ */
 function getVersionFct(versionId) {
     return this.versions.find(function (version) {
         return version._id._str == versionId._str;
     });
 }
+
+/**
+ * Return the last version of the element in the branch if the element stil exists, it is in the last version,
+ * else we do a deep search in order to find it.
+ * @param elementId
+ * @returns Element
+ */
 function getLastElementVersionFct(elementId) {
     return this.lastVersion().elements.getElements().find(function (elem) {
         return elem._id._str == elementId;
@@ -248,6 +276,10 @@ function getLastElementVersionFct(elementId) {
 
 
 /**  Class BRANCH FCT **/
+/**
+ * Return an array of branches owned by the current user
+ * @returns [Branch]
+ */
 function getUserBranchFct() {
     var currentUser;
     try {
@@ -258,6 +290,11 @@ function getUserBranchFct() {
     return Branch.find({$or: [ {'owner': currentUser, 'closed': false}, {'_id': 'master'}]});
 }
 
+/**
+ * Create a new branch
+ * @param branchName
+ * @returns Branch
+ */
 function createNewBranchFct(branchName) {
     let newBranch = new Branch();
     newBranch.name = branchName;
@@ -265,10 +302,18 @@ function createNewBranchFct(branchName) {
     return newBranch;
 }
 
+/**
+ * returns the master branch
+ * @returns Branch
+ */
 function getMasterBranchFct() {
     return Branch.findOne('master');
 }
 
+/**
+ * returns the last version in master
+ * @returns Version
+ */
 function getMasterHeadFct() {
     var master = Branch.getMasterBranch();
     if (master)

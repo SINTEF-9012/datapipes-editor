@@ -22,6 +22,10 @@ Array.prototype.remove = function() {
     return this;
 };
 
+/**
+ * Driver exported at the end
+ * @type {{applyPatchToArray: applyPatchToArrayFct, applyPatchToCollection: applyPatchToCollectionFct, compare: compareFct, compareDiff: compareDiffFct, identifyConflictsFromDiffs: identifyConflictsFromDiffsFct}}
+ */
 const driverJsonPatchMongo = {
     applyPatchToArray: applyPatchToArrayFct,
     applyPatchToCollection: applyPatchToCollectionFct,
@@ -30,6 +34,15 @@ const driverJsonPatchMongo = {
     identifyConflictsFromDiffs: identifyConflictsFromDiffsFct
 };
 
+/**
+ * This function is used to replace a property value by another one. It's recursive.
+ * Simply, we deep-search while we got more than one token.
+ * A token is an array like [ "location", "initialPosition", "x" ]. x is an attribute and others are objects.
+ * @param value
+ * @param tokens
+ * @param elem
+ * @returns {*}
+ */
 function applyPatchToElem(value, tokens, elem) {
     if (tokens.length > 1) {
         applyPatchToElem(value, tokens.slice(0,1), elem[tokens[0]]);
@@ -37,10 +50,21 @@ function applyPatchToElem(value, tokens, elem) {
         return elem[0] = value;
     }
 }
+
+/**
+ * Apply a set of patches to an array of elements.
+ * @param patch
+ * @param arrayOfElements
+ * @param targetCollection
+ * @param branchElements
+ */
 function applyPatchToArrayFct(patch, arrayOfElements, targetCollection, branchElements) {
     const keys = Object.keys(patch);
+    // a key is the id of an element
     keys.forEach((key) => {
         let requestset = {};
+        // a patch[key] is an array of patches on a element
+        // We are using JSON-patch standard except that the path would be "location.x" instead of "location/x"
         patch[key].forEach((patchelem) => {
             if (patchelem.op == "add") {
                 var elem = targetCollection.getLastElementVersion(key);
@@ -69,6 +93,11 @@ function applyPatchToArrayFct(patch, arrayOfElements, targetCollection, branchEl
     })
 }
 
+/**
+ * Apply patches directly in a mongo collection
+ * @param patch
+ * @param targetCollection
+ */
 function applyPatchToCollectionFct(patch, targetCollection) {
     /*** Step 1 : Preprocessing ***/
     //patch = transformPatch(patch);
@@ -101,11 +130,22 @@ function applyPatchToCollectionFct(patch, targetCollection) {
     });
 }
 
+/**
+ * Diff between collections
+ * @param collectionSrc
+ * @param collectionDst
+ */
 function compareFct(collectionSrc, collectionDst) {
     var diff = jsonpatch.compare(CollectionToMapByID(collectionSrc), CollectionToMapByID(collectionDst));
     return transformPatch(diff);
 }
 
+/**
+ * Diff of the diff
+ * @param diffSrc
+ * @param diffDst
+ * @returns {{}}
+ */
 function compareDiffFct(diffSrc, diffDst) {
     // merge keys from these two diff
     let keys = arrayUnique(Object.keys(diffSrc).concat(Object.keys(diffDst)));
@@ -124,6 +164,16 @@ function compareDiffFct(diffSrc, diffDst) {
     return mergedDiff;
 }
 
+/**
+ * A is a diff
+ * B is a diff
+ * we return C, an object, like :
+ *     - C.conflicts = A intersect B
+ *     - C.nonConflicts = A union B - A intersect B  (diff of the diff)
+ * @param diffSrc
+ * @param diffDst
+ * @returns {{}}
+ */
 function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
     let keys = arrayUnique(Object.keys(diffSrc).concat(Object.keys(diffDst)));
     let sortedDiff = {};
@@ -152,6 +202,11 @@ function identifyConflictsFromDiffsFct(diffSrc, diffDst) {
     return sortedDiff;
 }
 
+/**
+ * return a map : < idOfTheElement, element >
+ * @param collectionFetched
+ * @returns {{}}
+ */
 function CollectionToMapByID(collectionFetched) {
     var dataMapById = {};
     collectionFetched.forEach((component) => {

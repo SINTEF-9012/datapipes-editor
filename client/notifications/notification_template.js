@@ -23,6 +23,7 @@ Template.notification.events({
 
 });
 Template.notification.helpers({
+    // return the lapse of time since the creation of the notification (in minutes)
     timelapse() {
         var timelapse = Math.round((Session.get("time") -this.timestamp)/60000);
         if (timelapse < 0) {
@@ -37,6 +38,7 @@ Template.notification.helpers({
     }
 });
 
+// Every minute we update the date (we need it in order to have a reactive date)
 Meteor.setInterval(function() {
     Session.set("time", new Date());
 }, 60000);
