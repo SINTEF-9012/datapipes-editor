@@ -1,0 +1,71 @@
+<template name="leftbar">
+    <div id="sidebar" class="col-xs-2 gradientborder">
+        <h1>BigML</h1>
+        <div class="user">User: {{> loginButtons}}</div>
+
+        {{#if currentUser}}
+            <ul class="nav nav-pills">
+                <li class="{{isActiveRoute 'monitor'}}"><a href="/monitor/">Monitor</a></li>
+                <li class="{{isActiveRoute 'editor'}}"><a href="/editor/">Editor</a></li>
+                <li class="{{isActiveRoute 'history'}}"><a href="/history/">History</a></li>
+            </ul>
+            {{#if or (isActiveRoute 'editor') (isActiveRoute 'history')}}
+                <h3>Branch</h3>
+                <div style="text-align:center">
+                    <form style="width:92%;margin:auto">
+                        <div class="form-group">
+                            <select class="form-control">
+                                {{#each branch in branches}}
+                                    <option selected={{isSelectedBranch
+                                            branch}} value="{{branch._id}}">{{branch.name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            {{/if}}
+            {{#if isActiveRoute 'editor'}}
+                <div style="text-align:center">
+                    <button type="button" class="btn btn-default new" style="width:30%"
+                            disabled="{{notMasterBranchSelected}}">Create new
+                    </button>
+                    <button type="button" class="btn btn-default save" style="width:30%"
+                            disabled="{{masterBranchSelected}}">Save
+                    </button>
+                    <button type="button" class="btn btn-default merge" style="width:30%"
+                            disabled="{{masterBranchSelected}}">Push to master
+                    </button>
+                </div>
+
+                {{#unless masterBranchSelected}}
+                    <h3>Components</h3>
+                    {{> toolbox }}
+                {{/unless}}
+            {{/if}}
+            {{#if isActiveRoute 'history' }}
+                <ul class="list-group">
+                    {{#each version in versions}}
+                        <li class="list-group-item">
+                            <i class="fa fa-refresh rollback" idversion={{version._id._str}}></i> <span class="badge">{{formatDate version.timestamp}}</span>
+                        </li>
+                    {{/each}}
+                </ul>
+            {{/if}}
+        {{/if}}
+    </div>
+</template>
+
+<template name="mainarea">
+    <div id="mainarea" class="col-xs-10">
+        {{#if isActiveRoute 'editor'}}
+            {{#if masterBranchSelected }}
+                {{> canvas masterHead }}
+            {{else}}
+                {{> editorcanvas currentHead}}
+            {{/if}}
+        {{/if}}
+        {{#if isActiveRoute 'monitor'}}
+            {{> canvas masterHead }}
+        {{/if}}
+    </div>
+</template>

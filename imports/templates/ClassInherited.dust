@@ -1,0 +1,14 @@
+
+const {elementName} = {parentClass}.inherit({
+    name: 'bigml.{elementName}',
+    fields: {
+        {#attributes}{@sep}{attributeName}: {
+            type: {type},
+            {default}
+        },{/sep}
+        {@last}{attributeName}: {
+        type: {type},
+        {default}
+        }{/last}{/attributes}
+    }
+});

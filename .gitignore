@@ -1,11 +1,5 @@
 .idea
 ./node_modules
-./node_modules
-./app/bower_modules
-test
-test/*
+.meteor/local
 **/*~
 *~
-
-**/node_modules
-

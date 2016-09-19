@@ -1,0 +1,82 @@
+html, body, body > div {
+  height: 100%;
+}
+
+.gradientborder {
+  border-image: linear-gradient(to bottom, #fff 5%, #ccc 40%, #ccc 60%, #fff 95%);
+  border-image-slice: 1;
+  border-style: solid;
+}
+
+#sidebar {
+  border-width: 0 1px 0 0;
+  height: 100%;
+}
+#sidebar h1 {
+  color: #888;
+  /*margin-bottom: 50px;*/
+}
+#sidebar div.user {
+  text-align: right;
+  font-size: 16px;
+}
+#sidebar > ul {
+  margin-top: 20px;
+}
+#sidebar h2 {
+  margin-bottom: 20px;
+}
+#sidebar ul {
+  list-style-type: none;
+  padding-left: 0;
+  font-size: 18px;
+  overflow: hidden;
+}
+#sidebar ul.collapsed {
+  height: 0;
+}
+#sidebar ul > li > img {
+  height: 40px;
+  width: 40px;
+}
+#sidebar h3 {
+  cursor: pointer;
+}
+#sidebar h3 span.glyphicon {
+  font-size: 22px;
+  color: #ddd;
+}
+
+.loginwarning {
+  height: 100%;
+  text-align: center;
+}
+.loginwarning div.alert {
+  display: inline-block;
+  margin-top: 25%;
+}
+
+#properties {
+  border-width: 0 0 0 1px;
+  background-color: white;
+  height: 100%;
+
+  position: absolute;
+  right: 0;
+  overflow: hidden;
+  
+  transition: width 1s, padding 1s;
+}
+#properties.stowed {
+  width: 0;
+  padding: 0;
+}
+#properties h2 {
+  color: #999;
+  margin-top: 50px;
+  margin-left: 20px;
+}
+
+#mainarea {
+  height: 100%;
+}

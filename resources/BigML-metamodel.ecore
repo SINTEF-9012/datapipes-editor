@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="BigML">
+  <eClassifiers xsi:type="ecore:EClass" name="Property">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BigMLElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"
+        eType="#//Property" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//BigMLElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Port" eSuperTypes="#//BigMLElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="format" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="protocol" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="schema" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="portNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OutputPort" eSuperTypes="#//Port"/>
+  <eClassifiers xsi:type="ecore:EClass" name="InputPort" eSuperTypes="#//Port">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isMandatory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PipelineType" eSuperTypes="#//BigMLElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Pipeline" eSuperTypes="#//BigMLElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPort" lowerBound="1"
+        eType="#//OutputPort"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPort" lowerBound="1"
+        eType="#//InputPort"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="frequency" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="volume" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//PipelineType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ComponentType" eSuperTypes="#//BigMLElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Component" eSuperTypes="#//BigMLElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputPorts" upperBound="-1"
+        eType="#//OutputPort" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="login" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="password" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="IPAddress" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ComponentType"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resources" upperBound="-1"
+        eType="#//Resource"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isMaster" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataModel" eSuperTypes="#//BigMLElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components" upperBound="-1"
+        eType="#//Component" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pipelines" upperBound="-1"
+        eType="#//Pipeline" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ManagedComponentType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ManagedComponent" eSuperTypes="#//Component">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputPorts" upperBound="-1"
+        eType="#//InputPort" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ManagedComponentType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OutsourcedComponentType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="OutsourcedComponent" eSuperTypes="#//Component">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//OutsourcedComponentType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataProcessorType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DataProcessor" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//DataProcessorType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StorageSystemType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="StorageSystem" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="accessRights" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//StorageSystemType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataSourceType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DataSource" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//DataSourceType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DataVisualizerType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="DataVisualizer" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//DataVisualizerType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="MessageQueueType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="MessageQueue" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//MessageQueueType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ControlFlowComponentType" eSuperTypes="#//ComponentType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ControlFlowComponent" eSuperTypes="#//ManagedComponent">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ControlFlowComponentType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CompositeComponent" eSuperTypes="#//Component">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components" upperBound="-1"
+        eType="#//Component"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//ComponentType"/>
+  </eClassifiers>
+</ecore:EPackage>

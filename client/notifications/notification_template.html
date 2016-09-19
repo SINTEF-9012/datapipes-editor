@@ -1,0 +1,19 @@
+<template name="notification">
+    <div class="notification-panel notif-{{status}}" id="{{_id}}">
+        <div class="header row">
+            {{#if isActionType}}<i class="fa fa-check merge col-md-2"></i>{{else}}{{/if}}
+            <p class="{{#if isActionType}} {{else}} col-md-offset-2 {{/if}}col-md-8">{{status}}</p>
+            <i class="fa fa-times close-button col-md-2"></i>
+        </div>
+        <div class="content">{{description}}</div>
+        <div class="footer">{{#if timelapse}} {{timelapse}} minutes ago {{else}} less than a minute ago{{/if}}</div>
+    </div>
+</template>
+
+<template name="notificationContainer">
+    <div class="notification-container">
+        {{#each notificationelem in notifications}}
+            {{>notification notificationelem}}
+        {{/each}}
+    </div>
+</template>

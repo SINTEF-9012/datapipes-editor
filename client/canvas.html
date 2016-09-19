@@ -1,0 +1,25 @@
+<template name="canvasElements">
+  {{#each component in getElements}}
+    {{#with component}}
+      {{> Template.dynamic template=getBigmlComponentTemplate }}
+    {{/with}}
+  {{/each}}
+</template>
+
+<template name="canvas">
+  <svg class="unselectable" style="width:100%;height:100%">
+    {{> canvasElements }}
+  </svg>
+</template>
+
+<template name="editorcanvas">
+  {{> canvas }}
+</template>
+
+<template name="previewcanvas">
+  <svg class="unselectable" style="width:100%;height:200px">
+    <g transform="scale(0.2,0.2)">
+      {{> canvasElements }}
+    </g>
+  </svg>
+</template>
