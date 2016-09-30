@@ -1,0 +1,13 @@
+<template name="bigml_pipeline_arrow">
+  <path d="{{path}}" stroke="black" stroke-width="2" marker-end="url(#pipelinearrow)"/>
+</template>
+
+<template name="bigml_pipeline_preview">
+  {{#if visible}}
+    {{> bigml_pipeline_arrow pipeline}}
+  {{/if}}
+</template>
+
+<template name="bigml_pipeline">
+  {{> bigml_pipeline_arrow pipeline}}
+</template>

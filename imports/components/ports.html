@@ -1,0 +1,15 @@
+<template name="bigml_port">
+  <circle class="bigml-port" {{portPosition}} r="10" fill="white" stroke="black" stroke-width="2"/>
+</template>
+
+<template name="bigml_inputport">
+  <g class="bigml-inputport">
+    {{>bigml_port}}
+  </g>
+</template>
+
+<template name="bigml_outputport">
+  <g class="bigml-outputport">
+    {{>bigml_port}}
+  </g>
+</template>

@@ -4,6 +4,10 @@ import { Mongo } from 'meteor/mongo';
 if (Meteor.isClient) {
   import '/imports/components/basicTemplates.html'
   import '/imports/components/basicTemplates.js';
+  import '/imports/components/ports.html'
+  import '/imports/components/ports.js';
+  import '/imports/components/pipelines.html'
+  import '/imports/components/pipelines.js';
 }
 
 
@@ -133,6 +137,19 @@ const BigmlComponent = BigmlElement.inherit({
       type: BigmlLocation,
       default() { return new BigmlLocation(); }
     }
+  },
+  methods: {
+    getPortPosition(port) {
+      if (port instanceof BigmlOutputPort) {
+        var ind = this.outputPorts.findIndex(p => p._id._str == port._id._str); // Some strange bug seems to re-create new objects in memory while moving
+        if (ind >= 0) {
+          return {
+            x: this.location.x + this.location.width/2,
+            y: this.location.y - this.location.height/2 + this.location.height/(this.outputPorts.length+1)*(ind+1)
+          }
+        }
+      }
+    }
   }
 });
 
@@ -142,6 +159,21 @@ const BigmlManagedComponent = BigmlComponent.inherit({
     inputPorts: {
       type: [BigmlInputPort],
       default() { return []; }
+    }
+  },
+  methods: {
+    getPortPosition(port) {
+      if (port instanceof BigmlOutputPort) {
+        return BigmlComponent.prototype.getPortPosition.call(this,port);
+      } else if (port instanceof BigmlInputPort) {
+        var ind = this.inputPorts.findIndex(p => p._id._str == port._id._str); // Some strange bug seems to re-create new objects in memory while moving
+        if (ind >= 0) {
+          return {
+            x: this.location.x - this.location.width/2,
+            y: this.location.y - this.location.height/2 + this.location.height/(this.outputPorts.length+1)*(ind+1)
+          }
+        }
+      }
     }
   }
 });
@@ -211,7 +243,21 @@ const BigmlDatamodel = BigmlElement.inherit({
 
 /* -- Some more specific base types -- */
 const BigmlDataprocessor = BigmlManagedComponent.inherit({
-  name: 'bigml.dataprocessor'
+  name: 'bigml.dataprocessor',
+  fields: {
+    inputPorts: {
+      type: [BigmlInputPort],
+      default() {
+        return [ new BigmlInputPort() ];
+      }
+    },
+    outputPorts: {
+      type: [BigmlOutputPort],
+      default() {
+        return [ new BigmlOutputPort() ];
+      }
+    }
+  }
 });
 
 const BigmlStoragesystem = BigmlManagedComponent.inherit({
@@ -219,7 +265,15 @@ const BigmlStoragesystem = BigmlManagedComponent.inherit({
 });
 
 const BigmlDatasource = BigmlManagedComponent.inherit({
-  name: 'bigml.datasource'
+  name: 'bigml.datasource',
+  fields: {
+    outputPorts: {
+      type: [BigmlOutputPort],
+      default() {
+        return [ new BigmlOutputPort() ];
+      }
+    }
+  }
 });
 
 const BigmlDatavisualizer = BigmlManagedComponent.inherit({

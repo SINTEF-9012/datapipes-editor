@@ -1,14 +1,36 @@
 <template name="canvasElements">
   {{#each component in getElements}}
     {{#with component}}
-      {{> Template.dynamic template=getBigmlComponentTemplate }}
+      <g id={{_id}} class="bigml-component">
+        {{> Template.dynamic template=getBigmlComponentTemplate }}
+        {{#each port in inputPorts}}
+          {{> bigml_inputport component=this port=port}}
+        {{/each}}
+        {{#each port in outputPorts}}
+          {{> bigml_outputport component=this port=port}}
+        {{/each}}
+      </g>
+    {{/with}}
+  {{/each}}
+  {{#each pipeline in getPipelines}}
+    {{#with pipeline}}
+      <g id={{_id}} class="bigml-pipeline">
+        {{> bigml_pipeline }}
+      </g>
     {{/with}}
   {{/each}}
 </template>
 
 <template name="canvas">
   <svg class="unselectable" style="width:100%;height:100%">
-    {{> canvasElements }}
+    <defs>
+      <marker id="pipelinearrow" markerWidth="10" markerHeight="10" refx="9" refy="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="black" />
+      </marker>
+    </defs>
+    
+    {{> canvasElements version}}
+    {{> bigml_pipeline_preview overlayPipeline }}
   </svg>
 </template>
 
@@ -19,7 +41,7 @@
 <template name="previewcanvas">
   <svg class="unselectable" style="width:100%;height:200px">
     <g transform="scale(0.2,0.2)">
-      {{> canvasElements }}
+      {{> canvasElements version}}
     </g>
   </svg>
 </template>

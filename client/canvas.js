@@ -1,4 +1,5 @@
 import { Template } from 'meteor/templating';
+import { ReactiveVar } from 'meteor/reactive-var';
 import { Class, Type } from 'meteor/jagi:astronomy';
 
 import { Version } from '/imports/synchronization/version.js';
@@ -31,9 +32,25 @@ Template.registerHelper('getBigmlComponentTemplate', function() {
 Template.canvasElements.helpers({
   getElements: function() {
     if (this.elements)
-      return this.elements.getElements()
+      return this.elements.getElements();
+  },
+  getPipelines: function() {
+    if (this.elements)
+      return this.elements.pipelines;
   }
 });
+
+Template.canvas.onCreated(function() {
+  this.overlayPipeline = new ReactiveVar({
+    start: { x: 100, y: 100 },
+    end: { x: 200, y: 200},
+    visible: false
+  });
+});
+Template.canvas.helpers({
+  overlayPipeline() { return Template.instance().overlayPipeline; }
+});
+
 Template.editorcanvas.events({
   /* --- Drag-drop new elements onto canvas --- */
   'dragover'(event) {
@@ -62,7 +79,7 @@ Template.editorcanvas.events({
     }
   },
   /* --- Moving components on the canvas --- */
-  'mousedown g'(e, template) {
+  'mousedown g.bigml-component'(e, template) {
     e.preventDefault();
     e.stopPropagation();
     
@@ -88,7 +105,7 @@ Template.editorcanvas.events({
     attachMouseMove(svg, move);
   },
   /* --- Removing components from the canvas --- */
-  'dblclick' (e) {
+  'dblclick g.bigml-component' (e) {
     var parent = this.parent();
     if (parent instanceof Version || parent instanceof BigmlCompositeComponent) {
       var list;
@@ -104,8 +121,11 @@ Template.editorcanvas.events({
       }
     }
   },
+  'dblclick g.bigml-pipeline' (e) {
+    console.log('Remove:', this);
+  },
   /* --- Show/hide the properties bar on the right side --- */
-  'contextmenu g'(e, template) {
+  'contextmenu g.bigml-component'(e, template) {
     e.preventDefault();
     propertiesElement.set(this);
     window.testElem = this;

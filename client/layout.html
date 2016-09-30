@@ -59,13 +59,13 @@
     <div id="mainarea" class="col-xs-10">
         {{#if isActiveRoute 'editor'}}
             {{#if masterBranchSelected }}
-                {{> canvas masterHead }}
+                {{> canvas version=masterHead }}
             {{else}}
-                {{> editorcanvas currentHead}}
+                {{> editorcanvas version=currentHead}}
             {{/if}}
         {{/if}}
         {{#if isActiveRoute 'monitor'}}
-            {{> canvas masterHead }}
+            {{> canvas version=masterHead }}
         {{/if}}
     </div>
 </template>

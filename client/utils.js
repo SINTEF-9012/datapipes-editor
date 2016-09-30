@@ -52,7 +52,7 @@ Template.registerHelper('or', function() {
 
 
 /* --- Attach function on mousemove until mouseup or mouseout of parent element --- */
-var attachMouseMove = function(parent, callback) {
+var attachMouseMove = function(parent, callback, finishedcb) {
   var mouseup, mouseout;
   
   // Detach on mouseup
@@ -60,6 +60,8 @@ var attachMouseMove = function(parent, callback) {
     parent.removeEventListener('mousemove', callback);
     parent.removeEventListener('mouseup', mouseup);
     parent.removeEventListener('mouseout', mouseout);
+    
+    if (finishedcb && typeof finishedcb == 'function') finishedcb(e);
   };
   parent.addEventListener('mouseup',mouseup);
   
@@ -69,6 +71,8 @@ var attachMouseMove = function(parent, callback) {
       parent.removeEventListener('mousemove', callback);
       parent.removeEventListener('mouseup', mouseup);
       parent.removeEventListener('mouseout', mouseout);
+      
+      if (finishedcb && typeof finishedcb == 'function') finishedcb(e);
     }
   };
   parent.addEventListener('mouseout', mouseout);
