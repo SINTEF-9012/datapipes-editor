@@ -61,7 +61,7 @@ Template.editorcanvas.events({
     var type = event.originalEvent.dataTransfer.getData('bigmlcomponent');
     if (type && typeClassMap[type]) {
       // Where was it dropped?
-      if (this instanceof Version || this instanceof BigmlCompositeComponent) {
+      if ((this.version && this.version instanceof Version) || this instanceof BigmlCompositeComponent) {
         // Create a new type, and store it in the DB
         var obj = new typeClassMap[type]();
         if (obj instanceof BigmlComponent) {
@@ -69,11 +69,13 @@ Template.editorcanvas.events({
           obj.location.x = event.originalEvent.offsetX;
           obj.location.y = event.originalEvent.offsetY;
           // Add component to current version/composite
-          if (this instanceof Version)
-            this.elements.addElement(obj);
-          else if (this instanceof BigmlCompositeComponent)
+          if (this instanceof BigmlCompositeComponent) {
             this.children.push(obj);
-          this.save();
+            this.save();
+          } else if (this.version instanceof Version) {
+            this.version.elements.addElement(obj);
+            this.version.save();
+          }
         }
       }
     }
