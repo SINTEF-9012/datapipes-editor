@@ -95,10 +95,15 @@ function mergeFct() {
         let v = new Version();
         let branchHead = this.lastVersion();
         v.elements.components = branchHead.elements.getElements().slice();
+        v.elements.pipelines = branchHead.elements.pipelines.slice();
         v.owner = "system";
-        v.changes = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements.getElements()), getRawElements(v.elements.getElements()));
         v.previous = masterBranch.lastVersion()._id;
         v.mergedFrom = branchHead._id;
+      
+        var componentChanges = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements.getElements()), getRawElements(v.elements.getElements())),
+            pipelineChanges = driverJsonPatchMongo.compare(getRawElements(masterBranch.lastVersion().elements.pipelines), getRawElements(v.elements.pipelines));
+        v.changes = componentChanges;
+        Object.keys(pipelineChanges).forEach(c => v.changes[c] = pipelineChanges[c]);
 
         masterBranch.versions.push(v);
         masterBranch.save();
@@ -137,21 +142,28 @@ function pullFct() {
     var pulledVersion = Branch.getMasterBranch().getVersion(this.lastPulledVersion);
     var branchChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.getElements()), getRawElements(branchHead.elements.getElements()));
     var masterChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.getElements()), getRawElements(masterHead.elements.getElements()));
+    var branchPipeChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.pipelines), getRawElements(branchHead.elements.pipelines));
+    var masterPipeChanges = driverJsonPatchMongo.compare(getRawElements(pulledVersion.elements.pipelines), getRawElements(masterHead.elements.pipelines));
     // STEP 2
     // Compare these diffs. (kind of diff of diffs)
     // Generate a structure which contains in .conflicts conflicts ([ [patchs1], [patchs2] ] and in nonconflicts diff which is ok
     // return this structure to the user if it contains conflicts
     var diffOfTheChanges = driverJsonPatchMongo.identifyConflictsFromDiffs(branchChanges, masterChanges);
-    if (Object.keys(diffOfTheChanges.conflicts).length) {
+    var diffOfThePipeChanges = driverJsonPatchMongo.identifyConflictsFromDiffs(branchPipeChanges, masterPipeChanges);
+    console.log(diffOfTheChanges,diffOfThePipeChanges);
+  
+    if (Object.keys(diffOfTheChanges.conflicts).length,Object.keys(diffOfThePipeChanges.conflicts).length) {
         // Send conflicts to the user
-        return diffOfTheChanges;
+        return [diffOfTheChanges,diffOfThePipeChanges];
     } else {
         // No conflicts, we can merge
         let v = new Version();
         v.elements.components = pulledVersion.elements.getElements().slice();
+        v.elements.pipelines = pulledVersion.elements.pipelines.slice();
         // if we got changes non conflicted changes in the master branch we apply them
         if (Object.keys(diffOfTheChanges.nonConflicts).length)
             driverJsonPatchMongo.applyPatchToArray(diffOfTheChanges.nonConflicts, v.elements.getElements(), Branch.getMasterBranch(), branchHead.elements.getElements().slice());
+        //if (Object.keys(diffOfThePipeChanges.nonConflicts).length) // TODO HERE!!!
         v.changes = driverJsonPatchMongo.compare(getRawElements(branchHead.elements.getElements()), getRawElements(v.elements.getElements()));
 
         v.previous = branchHead._id;
@@ -244,7 +256,8 @@ function lastVersionFct() {
 function initFct() {
     let version = new Version();
     let masterHead = Branch.getMasterHead();
-    version.elements.components = masterHead.elements.getElements();
+    version.elements.components = masterHead.elements.getElements().slice();
+    version.elements.pipelines = masterHead.elements.pipelines.slice();
     version.previous = masterHead._id;
     this.versions.push(version);
     this.lastPulledVersion = masterHead._id;

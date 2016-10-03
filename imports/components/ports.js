@@ -14,21 +14,21 @@ Template.bigml_port.helpers({
 Template.bigml_outputport.events({
   'mousedown'(e, template) {
     if (e.button == 0) { // Only react to left-clicks
-      e.stopPropagation();
+      var canvas = template.findParentTemplate('editorcanvas'),
+          port = this.port;
       
-      var canvas = template.findParentTemplate('canvas');
-      var svg = canvas.find('svg');
-      var overlay = canvas.overlayPipeline;
-      var port = template.find('.bigml-port');
+      // Is this an editable canvas?
+      if (canvas) e.stopPropagation();
+      else return;
       
-      // Make a list of all available input ports
-      var inputPorts = canvas.findAll('.bigml-inputport .bigml-port').map((port) => {
-        return {
-          x: parseInt(port.getAttribute('cx')),
-          y: parseInt(port.getAttribute('cy')),
-          data: Blaze.getData(port).port
-        };
-      });
+      // Find possible input ports (not current component)
+      var inputPorts = canvas.data.version.elements.components.filter(c => c._id._str != this.component._id._str && c.inputPorts && c.inputPorts.length).reduce((ports,c) => {
+        return ports.concat(c.inputPorts.map(port => {
+          var pos = c.getPortPosition(port);
+          pos.data = port;
+          return pos;
+        }));
+      },[]);
       
       // Function to find closest port (within a limit)
       var findClosestPort = function(e) {
@@ -44,14 +44,15 @@ Template.bigml_outputport.events({
       };
       
       // Move overlay to current port position
+      var overlay = template.findParentTemplate('canvas').overlayPipeline;
       overlay.set({
-        start: { x: port.getAttribute('cx'), y: port.getAttribute('cy') },
+        start: this.component.getPortPosition(this.port),
         end: { x: e.offsetX, y: e.offsetY },
         visible: true
       });
       
       // Move with mouse, and do something when we are done
-      attachMouseMove(svg, function(e) {
+      attachMouseMove(canvas.find('svg'), function(e) {
         var nearby = findClosestPort(e);
         var pos = overlay.get();
         
@@ -69,7 +70,7 @@ Template.bigml_outputport.events({
         overlay.set(pos);
         
         // Add pipeline between these two ports
-        var start = Blaze.getData(port) ? Blaze.getData(port).port : undefined;
+        var start = port;
         var end = findClosestPort(e) ? findClosestPort(e).data : undefined;
         
         if (start && end) {

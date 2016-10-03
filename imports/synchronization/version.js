@@ -55,11 +55,11 @@ const Version = Class.create({
     findComponentOwningPort(port) {
       if (port instanceof BigmlOutputPort) {
         return this.elements.components.find(component => {
-          return component.outputPorts.some(p => p._id._str == port._id._str);
+          return component.outputPorts && component.outputPorts.some(p => p._id._str == port._id._str);
         });
       } else if (port instanceof BigmlInputPort) {
         return this.elements.components.find(component => {
-          return component.inputPorts.some(p => p._id._str == port._id._str);
+          return component.inputPorts && component.inputPorts.some(p => p._id._str == port._id._str);
         });
       }
     },

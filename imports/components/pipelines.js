@@ -2,7 +2,10 @@ import { Template } from 'meteor/templating';
 
 Template.bigml_pipeline_arrow.helpers({
   path() {
-    return 'M '+this.start.x+','+this.start.y+' L '+this.end.x+','+this.end.y;
+    if (this.start && this.end)
+      return 'M '+this.start.x+','+this.start.y+' L '+this.end.x+','+this.end.y;
+    else
+      return '';
   }
 });
 

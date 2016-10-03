@@ -107,8 +107,11 @@ Template.editorcanvas.events({
     attachMouseMove(svg, move);
   },
   /* --- Removing components from the canvas --- */
-  'dblclick g.bigml-component' (e) {
-    var parent = this.parent();
+  'dblclick g.bigml-component' (e, template) {
+    var version = template.data.version,
+        pipelines = version.elements.pipelines,
+        parent = this.parent();
+    
     if (parent instanceof Version || parent instanceof BigmlCompositeComponent) {
       var list;
       if (parent instanceof Version)
@@ -116,15 +119,27 @@ Template.editorcanvas.events({
       else if (parent instanceof BigmlCompositeComponent)
         list = parent.children;
       
+      // Remove pipelines connected to the component
+      console.log(version.elements.pipelines);
+      version.elements.pipelines = pipelines.filter(p => {
+        return version.findComponentOwningPort(p.outputPort) != this && version.findComponentOwningPort(p.inputPort) != this;
+      });
+      console.log(version.elements.pipelines);
+      
+      // Remove component
       var i = list.indexOf(this);
-      if (i >= 0) {
-        list.splice(i,1);
-        parent.save();
-      }
+      if (i >= 0) list.splice(i,1);
+      
+      version.save();
     }
   },
-  'dblclick g.bigml-pipeline' (e) {
-    console.log('Remove:', this);
+  'dblclick g.bigml-pipeline' (e, template) {
+    var version = template.data.version,
+        pipelines = version.elements.pipelines;
+    
+    // Remove pipeline
+    pipelines.splice(pipelines.indexOf(this),1);
+    version.save();
   },
   /* --- Show/hide the properties bar on the right side --- */
   'contextmenu g.bigml-component'(e, template) {
