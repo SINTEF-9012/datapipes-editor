@@ -12,7 +12,16 @@ var calcRectAttributes = function(location) {
 };
 
 Template['bigml.component'].helpers({
-  svgAttributes() { return calcRectAttributes(this.location); }
+  svgAttributes() { return calcRectAttributes(this.location); },
+  name() {
+    if (this.name) return this.name;
+    else return '['+this.type+']';
+  },
+  color() {
+    if (this.type == 'bigml.storagesystem') return '#d9edf7';
+    else if (this.type == 'bigml.datasource') return '#dff0d8';
+    else return '#f7f7f9';
+  }
 });
 
 Template['bigml.compositecomponent'].helpers({
@@ -57,7 +66,7 @@ Template['bigml.compositecomponent'].events({
   },
 });
 
-
+/*
 Template['bigml.storagesystem'].helpers({
   svgAttributes() {
     return {
@@ -67,3 +76,4 @@ Template['bigml.storagesystem'].helpers({
     };
   }
 });
+*/

@@ -22,9 +22,21 @@ Template.leftbar.events({
   'click button.save'(event) {
     Branch.findOne(selectedBranch.get()).commit();
   },
-  'click .merge'(event) {
-    let conflicts = Branch.findOne(selectedBranch.get()).pull();
-    PopupShow('merge', conflicts);
+  'click button.merge'(event) {
+    var branch = Branch.findOne(selectedBranch.get());
+    
+    // Try to push without pulling first
+    if (branch.push()) {
+      // Success, no more action required
+      selectedBranch.set('master');
+    } else {
+      // Didn't work, we need to pull first
+      var result = branch.pull();
+      if (result === true)
+        branch.push(); // The pulling was succesfull, retry the push
+      else
+        PopupShow('merge', result); // Need to do manual merging
+    }
   },
   'click .rollback'(event) {
     var idVersionClicked = $(event.currentTarget).attr('idversion');
@@ -34,7 +46,7 @@ Template.leftbar.events({
 
 Template.leftbar.helpers({
   branches() {
-    return Branch.getUserBranches();
+    return Branch.UserBranches();
   },
   selectedBranch() {
     return selectedBranch.get();
@@ -55,11 +67,10 @@ Template.leftbar.helpers({
 
 Template.mainarea.helpers({
   masterHead() {
-    return Branch.getMasterHead();
+    return Branch.Master().head();
   },
   currentHead() {
     var branch = Branch.findOne(selectedBranch.get());
-    if (branch)
-      return branch.lastVersion();
+    if (branch) return branch.head();
   }
 });

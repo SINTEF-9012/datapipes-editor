@@ -170,7 +170,7 @@ const BigmlManagedComponent = BigmlComponent.inherit({
         if (ind >= 0) {
           return {
             x: this.location.x - this.location.width/2,
-            y: this.location.y - this.location.height/2 + this.location.height/(this.outputPorts.length+1)*(ind+1)
+            y: this.location.y - this.location.height/2 + this.location.height/(this.inputPorts.length+1)*(ind+1)
           }
         }
       }
@@ -261,7 +261,15 @@ const BigmlDataprocessor = BigmlManagedComponent.inherit({
 });
 
 const BigmlStoragesystem = BigmlManagedComponent.inherit({
-  name: 'bigml.storagesystem'
+  name: 'bigml.storagesystem',
+  fields: {
+    inputPorts: {
+      type: [BigmlInputPort],
+      default() {
+        return [ new BigmlInputPort() ];
+      }
+    }
+  }
 });
 
 const BigmlDatasource = BigmlManagedComponent.inherit({

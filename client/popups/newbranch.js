@@ -14,8 +14,9 @@ Template.popupNewBranch.events({
   },
   'click button.create, submit form'(event,template) {
     event.preventDefault();
-    // Create the new branch
-    var branch = Branch.createNewBranch(this.get('name'));
+    // Create a new branch from the currently selected one
+    var old_branch = Branch.findOne(selectedBranch.get()),
+        branch = old_branch.branch(this.get('name'));
     selectedBranch.set(branch._id);    
     
     // Close dialog

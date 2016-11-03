@@ -1,6 +1,6 @@
 <template name="bigml.component">
-  <rect {{svgAttributes}} rx="10" ry="10" stroke="black" stroke-width="2" fill="white"/>
-  <text x={{location.x}} y={{location.y}} text-anchor="middle" alignment-baseline="central" font-size=10>{{type}}</text>
+  <rect {{svgAttributes}} rx="10" ry="10" stroke="black" stroke-width="2" fill="{{color}}"/>
+  <text x={{location.x}} y={{location.y}} text-anchor="middle" alignment-baseline="central" font-size=10>{{name}}</text>
 </template>
 
 <template name="bigml.compositecomponent">
@@ -16,6 +16,8 @@
   <rect class="resize" {{resizeAttributes}} fill="transparent" style="cursor:se-resize"/>
 </template>
 
+<!--
 <template name="bigml.storagesystem">
   <circle {{svgAttributes}} fill="red" stroke="black" stroke-width="2"/>
 </template>
+-->

@@ -60,7 +60,5 @@ Template.toolboxthumbnail.helpers({
 });
 
 Template.body.helpers({
-    masterHead() {
-        return Branch.getMasterHead();
-    }
+    masterHead() { return Branch.Master().head(); }
 });

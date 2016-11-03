@@ -9,117 +9,87 @@ Template.popupMerge.onCreated(function() {
   this.conflictResultVar = new ReactiveVar({});
 });
 
-Template.popupMerge.onRendered(function() {
-  this.conflictResultVar.set({});
-});
-var contains = function(needle) {
-  // Per spec, the way to identify NaN is that it is not equal to itself
-  var findNaN = needle !== needle;
-  var indexOf;
-
-  if(!findNaN && typeof Array.prototype.indexOf === 'function') {
-    indexOf = Array.prototype.indexOf;
-  } else {
-    indexOf = function(needle) {
-      var i = -1, index = -1;
-
-      for(i = 0; i < this.length; i++) {
-        var item = this[i];
-
-        if((findNaN && item !== item) || item === needle) {
-          index = i;
-          break;
-        }
-      }
-
-      return index;
-    };
-  }
-
-  return indexOf.call(this, needle) > -1;
-};
-
-var conflictResolutionResult = {};
 Template.popupMerge.events({
+  'click div.conflict'(event, template) {
+    var resolution = template.conflictResultVar.get();
+    resolution[this.key] = this.branch;
+    template.conflictResultVar.set(resolution);
+  },
+  'click button.merge-cancel'(event, template) {
+    template.conflictResultVar.set({});
+  },
+  'click button.merge-continue'(event, template) {
+    var conflicts = this.get('data'),
+        resolution = template.conflictResultVar.get(),
+        branch = Branch.findOne(selectedBranch.get());
+    
+    // Merge nonconflicting and resolved conflicting options into a new set of patches
+    var patches = {};
+    Object.keys(resolution).forEach(key => {
+      if (resolution[key] == 'current')
+        patches[key] = conflicts.conflicting[key][1];
+      else if (resolution[key] == 'master')
+        patches[key] = conflicts.conflicting[key][0];
+    });
+    
+    // Try to pull changes in master with given conflict resolution patches
+    var result = branch.pull(patches);
+    
+    this.set('data',undefined);
+    template.conflictResultVar.set({})
+    
+    if (result === true) {
+      // It worked, push master
+      if (branch.push())
+        selectedBranch.set('master');
+    } else {
+      // Something went wrong, try again
+      this.set('data',result);
+      event.stopImmediatePropagation();
+    }
+  },
   'click button, submit form'(event,template) {
     event.preventDefault();
-    // Do something usefull
-    
     // Close dialog
     template.$('.modal').modal('hide');
-  },
-  'click .push-button'(event, template) {
-
-    if (Object.keys(template.conflictResultVar.get()).length) {
-      let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
-      Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
-    }
-    conflictResolutionResult = {};
-    template.conflictResultVar.set({});
-    console.log("Merge");
-    Branch.findOne(selectedBranch.get()).merge();
-    selectedBranch.set(undefined);
-  },
-  'click .continue-button'(event, template) {
-    if (Object.keys(template.conflictResultVar.get()).length) {
-      let newMap = $.extend(template.conflictResultVar.get(),this.get('data').nonConflicts);
-      Branch.findOne(selectedBranch.get()).applyConflictResolution(newMap);
-    }
-    template.conflictResultVar.set({});
-    conflictResolutionResult = {};
-  },
-  'click .conflict'(event, template) {
-    var idElemClicked = $(event.currentTarget).attr('idelement');
-    var whichBranch = $(event.currentTarget).attr('branch');
-    conflictResolutionResult[idElemClicked] = this.get('data').conflicts[idElemClicked][whichBranch];
-    template.conflictResultVar.set(conflictResolutionResult);
   }
 });
 
 Template.popupMerge.helpers({
-  conflictResolutionCompleted() {
-
-    if (this.get('data') && this.get('data').conflicts) {
-
-      if (Object.keys(this.get('data').conflicts).length == 0) {
-        return {}
-      }
-      if (Object.keys(Template.instance().conflictResultVar.get()).length >= Object.keys(this.get('data').conflicts).length) {
-        return {};
-      }
-      return {disabled:'disabled'};
-    } else {
-      return {};
-    }
-
-  },
-  conflictElementStatus(key, branch) {
-    if (this.get('data') && this.get('data').conflicts) {
-      if (Object.keys(Template.instance().conflictResultVar.get()).length == 0) {
-        return 'panel-default';
-      } else if (JSON.stringify(Template.instance().conflictResultVar.get()[key]) == JSON.stringify(this.get('data').conflicts[key][branch])) {
-        return 'panel-success';
-      } else {
-        return 'panel-danger';
-      }
-    } else return '';
-  },
-  getconflict(key) {
-    return this.get('data').conflicts[key];
-  },
-  getOperationType(patch) {
-    return patch[0].op;
-  },
-  keys() {
-    if (this.get('data') && this.get('data').conflicts)
-      return Object.keys(this.get('data').conflicts);
+  conflicts() {
+    var conflicts = this.get('data');
+    if (conflicts && conflicts.conflicting)
+      return Object.keys(conflicts.conflicting).map(key => { return { key: key, master: conflicts.conflicting[key][0], branch: conflicts.conflicting[key][1] }});
     else
       return [];
   },
-  data() {
-    if (this.get('data') && this.get('data').conflicts)
-      return JSON.stringify(this.get('data').conflicts);
+  mergeButtonEnabled() {
+    var popup = Template.instance(),
+        resolution = popup.conflictResultVar.get(),
+        conflicts = this.get('data');
+    
+    if (conflicts && conflicts.conflicting) {
+      var allFixed = Object.keys(conflicts.conflicting).reduce((others,key) => others && key in resolution && !!resolution[key],true);
+      if (allFixed) return {};
+    }
+    return { disabled: true };
+  }
+});
+
+Template.popupMergeChoice.helpers({
+  operation() {
+    console.log(this);
+    return this.changes[0].op;
+  },
+  conflictPanelClass() {
+    var popup = Template.instance().findParentTemplate('popupMerge'),
+        resolution = popup.conflictResultVar.get();
+    
+    if (this.key in resolution && resolution[this.key] == this.branch)
+      return 'panel-success';
+    if (this.key in resolution)
+      return 'panel-danger';
     else
-      return '';
+      return 'panel-default';
   }
 });

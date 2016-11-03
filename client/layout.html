@@ -16,8 +16,7 @@
                         <div class="form-group">
                             <select class="form-control">
                                 {{#each branch in branches}}
-                                    <option selected={{isSelectedBranch
-                                            branch}} value="{{branch._id}}">{{branch.name}}</option>
+                                    <option selected={{isSelectedBranch branch}} value="{{branch._id}}">{{branch.name}}</option>
                                 {{/each}}
                             </select>
                         </div>
@@ -56,16 +55,19 @@
 </template>
 
 <template name="mainarea">
-    <div id="mainarea" class="col-xs-10">
-        {{#if isActiveRoute 'editor'}}
-            {{#if masterBranchSelected }}
-                {{> canvas version=masterHead }}
-            {{else}}
-                {{> editorcanvas version=currentHead}}
-            {{/if}}
-        {{/if}}
-        {{#if isActiveRoute 'monitor'}}
-            {{> canvas version=masterHead }}
-        {{/if}}
-    </div>
+  <div id="mainarea" class="col-xs-10">
+    {{#if isActiveRoute 'editor'}}
+      {{#if masterBranchSelected }}
+        {{> canvas version=masterHead }}
+      {{else}}
+        {{> editorcanvas version=currentHead}}
+      {{/if}}
+    {{/if}}
+    {{#if isActiveRoute 'monitor'}}
+      {{> canvas version=masterHead }}
+    {{/if}}
+    {{#if isActiveRoute 'history'}}
+      {{> historygraph }}
+    {{/if}}
+  </div>
 </template>

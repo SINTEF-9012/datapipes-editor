@@ -1,48 +1,42 @@
+<template name="popupMergeChoice">
+  <div class="col-xs-6">
+    <div class="panel conflict {{conflictPanelClass key branch}}">
+      <div class="panel-heading">
+        <h3 class="panel-title"><strong>{{operation}}</strong>: {{key}}</h3>
+      </div>
+      <div class="panel-body">
+        {{#each change in changes}}
+        <div class="change">- {{change.path}}: {{change.value}}</div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
+
 <template name="popupMerge">
   <div class="modal fade" id="popupNewBranch" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-          <h4><i class="fa fa-exclamation-circle"></i> Conflicts resolution helper</h4>
+          <h4><i class="fa fa-exclamation-circle"></i> There are conflicts that needs to be resolved, please pick changes to keep below</h4>
         </div>
         <div class="modal-body">
-          {{#if data}}
-              <div class="row">
-                  <h2 class="col-md-6" style="text-align:center;">Branch</h2>
-                  <h2 class="col-md-6" style="text-align:center;">Master</h2>
-              </div>
+          <div class="row">
+            <h2 class="col-xs-6" style="text-align:center;">Branch</h2>
+            <h2 class="col-xs-6" style="text-align:center;">Master</h2>
+          </div>
           <hr/>
-              {{#each key in keys}}
-                  <div class="row">
-                      {{#each choice in getconflict key}}
-                          <div class="col-xs-6">
-                              <div class="panel {{conflictElementStatus key @index}} conflict" idelement={{key}} branch={{@index}}>
-                                  <div class="panel-heading">
-                                      <h3 class="panel-title"><strong>{{getOperationType choice}}</strong>: {{key}}</h3>
-                                  </div>
-                                  <div class="panel-body">
-                                      {{#each change in choice}}
-                                          <div class="change">
-                                             - {{change.path}}: {{change.value}}
-                                          </div>
-                                      {{/each}}
-                                  </div>
-                              </div>
-                          </div>
-                      {{/each}}
-                  </div>
-              {{/each}}
-          {{else}}
-              <div class="alert alert-success" role="alert">
-                  <strong>Success!</strong> You can now continue to work on your branch or push to master.
-              </div>
-          {{/if}}
+          {{#each conflict in conflicts}}
+            <div class="row">
+              {{> popupMergeChoice key=conflict.key changes=conflict.branch branch='current'}}
+              {{> popupMergeChoice key=conflict.key changes=conflict.master branch='master'}}
+            </div>
+          {{/each}}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary continue-button" {{conflictResolutionCompleted}}><i class="fa fa-pencil-square-o"></i> <strong>Continue</strong> to edit</button>
-          <button type="button" class="btn btn-primary push-button" {{conflictResolutionCompleted}}><i class="fa fa-cogs"></i> <strong>Push</strong> to Master</button>
+          <button type="button" class="btn btn-default merge-cancel" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary merge-continue" {{mergeButtonEnabled}}><i class="fa fa-cogs"></i> <strong>Merge</strong> and push to Master</button>
         </div>
       </div>
     </div>
